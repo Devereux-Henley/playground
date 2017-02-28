@@ -1,0 +1,25 @@
+# Example systemd service file for playground
+# uses a parameter
+# 'systemctl start playground@prod' will start playground with the profile to 'prod'
+
+# Dependencies:
+# Install boot /usr/local/bin/boot
+# Create a user playground with a home directory of /home/playground
+# Clone the playground repo to a directory called 'playground' under /home/playground
+# Place this file under /etc/systemd/system on Arch Linux (and other systems that use systemd)
+# Ensure service survives reboot with 'systemctl enable playground@prod'
+
+[Unit]
+Description=playground
+
+[Service]
+Type=simple
+Environment="BOOT_JVM_OPTIONS='-Djava.awt.headless=true -Xms256m -Xmx512m'"
+Environment="DISPLAY=:0"
+ExecStart=/usr/local/bin/boot run -p %i
+Restart=always
+User=playground
+WorkingDirectory=/home/playground/playground
+
+[Install]
+WantedBy=multi-user.target

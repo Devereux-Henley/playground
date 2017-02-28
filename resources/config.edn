@@ -1,0 +1,17 @@
+;;Applications configuration file
+
+{:secrets #include #join [#env HOME "/.secrets.edn"]
+
+ :server
+ #profile {:dev {:port 3000}}
+
+ :db-host "localhost"
+ :db-port 3306
+ :db-name "requirements"
+
+ :db
+ {:classname "com.mysql.cj.jdbc.Driver"
+  :subprotocol "mysql"
+  :subname  "//localhost:3306/requirements"
+  :user "root"
+  :password ^:ref [:secrets :db-password]}}
