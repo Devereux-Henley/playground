@@ -8,7 +8,7 @@
 
 (defn config
   [profile]
-  (aero/read-config (io/resource "config.edn") {:profile profile}))
+  (aero/read-config (io/file "configuration/config.edn") {:profile profile}))
 
 (defn configure-components
   [system config]

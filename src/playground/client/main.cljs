@@ -1,11 +1,11 @@
 (ns playground.client.main
   (:require 
-    [goog.dom :as gdom]
-    [om.next :as om]))
+   [goog.dom :as gdom]
+   [om.next :as om]
+   [playground.shared.requirements :as r]))
 
 (defn init
   []
-  (om/add-root!
-    reconciler
-    Counter
-    (gdom/getElement "app")))
+  (r/projects-init r/project-reconciler))
+
+(init)
