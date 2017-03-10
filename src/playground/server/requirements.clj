@@ -12,9 +12,9 @@
    [yada.yada :as yada]))
 
 (defn project-page
-  []  
+  [response]  
   (let [reconciler (r/make-reconciler)
-        root (om/add-root! reconciler r/Counter nil)
+        root (om/add-root! reconciler r/ProjectList response)
         html-string (dom/render-to-str root)]
     (html
       [:head
@@ -42,7 +42,7 @@
                                          (db/get-projects db-spec)
                                          (db/get-project-by-id db-spec {:id id}))]
                           (case (yada/content-type ctx)
-                            "text/html" (project-page) 
+                            "text/html" (project-page response) 
                             response)))}}}))
 
 (defn requirements-routes

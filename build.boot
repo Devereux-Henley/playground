@@ -11,22 +11,24 @@
     [weasel "0.7.0" :scope "test"] ;; Websocket Server
     [reloaded.repl "0.2.3" :scope "test"] 
 
-    [org.clojure/tools.nrepl "0.2.12"]
     
+    [org.clojure/tools.nrepl "0.2.12" :scope "test"]
     ;; Needed for start-repl in cljs repl
     [com.cemerick/piggieback "0.2.1" :scope "test"]
+    
+    [com.stuartsierra/component "0.3.2"]
 
     ;; Server deps
-    [aero "1.0.1"]
+    [aero "1.0.3"]
     [aleph "0.4.2-alpha10"] 
-    [bidi "2.0.14"]
-    [com.layerware/hugsql "0.4.7"]
-    [hiccup "1.0.5"]
+    [bidi "2.0.16"]
+    [com.layerware/hugsql "0.4.7"]    
+    [hiccup "1.0.5"]    
     [metosin/ring-swagger "0.22.12"]
     [mysql/mysql-connector-java "6.0.5"]
     [org.omcljs/om "1.0.0-alpha48"]
     [prismatic/schema "1.1.3"] 
-    [yada "1.2.0"]
+    [yada "1.2.1"]
 
     ;; App deps
     [com.cognitect/transit-clj "0.8.285"]
@@ -41,7 +43,7 @@
   '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
   '[adzerk.boot-reload :refer [reload]]
   '[com.stuartsierra.component :as component]
-  '[clojure.tools.namespace.repl]
+  '[clojure.tools.namespace.repl]  
   '[playground.server.system :refer [new-system]])
 
 (def repl-port 5600)
@@ -54,15 +56,15 @@
   "Develop the server backend. The system is automatically started in
   the dev profile."
   []
-  (require 'reloaded.repl)
-  (let [go (resolve 'reloaded.repl/go)]
-    (try
-      (require 'user)
-      (go)
-      (catch Exception e
-        (boot.util/fail "Exception while starting the system\n")
-        (boot.util/print-ex e))))
-  identity)
+  (with-pass-thru _
+    (require 'reloaded.repl)
+    (let [go (resolve 'reloaded.repl/go)]
+      (try
+        (require 'user)
+        (go)
+        (catch Exception e
+          (boot.util/fail "Exception while starting the system\n")
+          (boot.util/print-ex e))))))
 
 (deftask dev
   "This is the main development entry point."
@@ -75,20 +77,20 @@
 
   (comp    
     (watch)
-    (speak) 
+    (speak)
     (reload :on-jsload 'playground.client.main/init)
     (cljs-repl :nrepl-opts {:client false
                             :port repl-port
-                            :init-ns 'user}) ; this is also the server repl!
+                            :init-ns 'user}) ; this is also the server repl!    
     (cljs :ids #{"playground"} :optimizations :none)    
-    (dev-system)
+    (dev-system)    
     (target :dir #{"static"})))
 
 (deftask build
   "This is used for creating optimized static resources under static"
   []
-  (comp 
-    (cljs :ids #{"playground"} :optimizations :advanced)
+  (comp    
+    (cljs :ids #{"playground"} :optimizations :advanced)    
     (target :dir #{"static"})))
 
 (defn- run-system [profile]
