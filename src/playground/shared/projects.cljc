@@ -1,4 +1,4 @@
-(ns playground.shared.requirements
+(ns playground.shared.projects
   (:require
    #?(:cljs [goog.dom :as gdom])
    [om.dom :as dom]

@@ -67,10 +67,10 @@
 (defn new-index-resource
   [db-spec]
   (yada/resource
-    {:id :playground.resources/projects-index
+    {:id :edge.resources/projects-index
      :description "Requirements entries"
      :produces [{:media-type
-                 #{"text/html" "application/transit+json;q=0.9"}
+                 #{"text/html" "application/edn;q=0.9" "application/json;q=0.8" "application/transit+json;q=0.9"}
                  :charset "UTF-8"}]
      :methods
      {:get {:parameters {:query {(s/optional-key :id) String}}
@@ -104,10 +104,10 @@
                routes
                {:info {:title "Projects"
                        :version "1.0"
-                       :description "A simple application for displaying projects"}
+                       :description "A simple application for displaying requirements"}
                 :host (format "localhost:%d" port)
                 :schemes ["http"]
                 :tags [{:name "getters"
                         :description "All paths that support GET"}]
                 :basePath ""})))
-         :playground.resources/projects-swagger)]]]))
+         :edge.resources/projects-swagger)]]]))
