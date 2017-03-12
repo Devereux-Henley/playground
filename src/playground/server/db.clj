@@ -9,14 +9,18 @@
 (s/def :unq/subname string?)
 (s/def :unq/user string?)
 (s/def :unq/password string?)
-(s/def ::db (s/keys :req-un [:unq/classname :unq/subprotocol :unq/subname :unq/user :unq/password]))
+(s/def :unq/serverTimezone string?)
+(s/def ::db (s/keys
+              :req-un
+              [:unq/classname :unq/subprotocol :unq/subname :unq/user :unq/password :unq/serverTimezone]))
 
 (defrecord db
-  [classname
-   subprotocol
-   subname
-   user
-   password]
+    [classname
+     subprotocol
+     subname
+     user
+     password
+     serverTimezone]
   Lifecycle
   (start
     [component]

@@ -13,5 +13,6 @@
  {:classname "com.mysql.cj.jdbc.Driver"
   :subprotocol "mysql"
   :subname  "//localhost:3306/requirements"
+  :serverTimezone "America/Chicago"
   :user "root"
   :password ^:ref [:secrets :db-password]}}

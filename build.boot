@@ -25,13 +25,14 @@
     [com.layerware/hugsql "0.4.7"]    
     [hiccup "1.0.5"]    
     [metosin/ring-swagger "0.22.12"]
-    [mysql/mysql-connector-java "6.0.5"]
+    [mysql/mysql-connector-java "6.0.6"]
     [org.omcljs/om "1.0.0-alpha48"]
     [prismatic/schema "1.1.3"] 
     [yada "1.2.1"]
 
     ;; App deps
-    [com.cognitect/transit-clj "0.8.285"]
+    [cljs-ajax "0.5.8"]
+    [com.cognitect/transit-clj "0.8.297"]
 
     ;; Logging
     [org.clojure/tools.logging "0.3.1"]])
