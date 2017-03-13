@@ -8,11 +8,8 @@
 (defmulti read-projects om/dispatch)
 
 (defmethod read-projects :default
-  [{:keys [state] :as env} key _]
-  (let [st @state]    
-    (if-let [[_ value] (find st key)]
-      {:value value :remote (:ast env)}
-      {:remote true})))
+  [env key _]
+  (util/default-parser env key))
 
 (defmethod read-projects :projects/all-projects
   [{:keys [state] :as env} key _]  

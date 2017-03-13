@@ -3,41 +3,38 @@
    [bidi.bidi :as bidi]
    [hiccup.core :refer [html]]
    [hiccup.page :refer [include-js include-css]]
-   [om.next :as om]
-   [om.dom :as dom]
+   [om.next :as om]   
    [playground.server.db.requirements :as db]
    [playground.shared.projects :as r]
+   [playground.shared.util :refer [create-om-string server-send]]
    [schema.core :as s]
    [yada.swagger :as swagger]
    [yada.yada :as yada]))
 
-(declare server-send)
+;; Data Templating
 
 (defn sanitize-project-response
-  [response]  
-  (if (empty? response)
+  [response]    
+  (mapv
+    (fn [{:keys [name description]} cnt]
+      [cnt {:project/name name :project/description description}])
     response
-    (mapv
-      (fn [{:keys [name description]} cnt]
-        [cnt {:project/name name :project/description description}])
-      response
-      (iterate inc 0))))
+    (iterate inc 1)))
 
 (defn project-page
   [send-func]  
-  (let [reconciler (r/make-reconciler send-func)
-        root (om/add-root! reconciler r/ProjectList nil)
-        html-string (dom/render-to-str root)]    
+  (let [reconciler (r/make-reconciler send-func)        
+        project-string (create-om-string reconciler r/ProjectList)]    
     (html
       [:head
        [:meta {:charset "utf-8"}]
        [:meta {:http-equiv "X-UA-Compatible"}]
        [:title "Projects List"]]
       [:body
-       [:section#projects html-string]       
+       [:section#projects project-string]       
        (include-js "/playground.js")])))
 
-;; Om.Next parsing.
+;; Om.Next Parsing.
 
 (defmulti read-projects om/dispatch)
 
@@ -56,36 +53,28 @@
 (def project-parser
   (om/parser {:read read-projects}))
 
-(defn server-send
-  [db-spec]
-  (fn [{:keys [remote]} callback]
-    (let [response (project-parser {:db-spec db-spec} remote)]      
-      (callback response remote))))
-
 ;; Yada Resources
 
 (defn new-index-resource
   [db-spec]
-  (yada/resource
-    {:id :edge.resources/projects-index
-     :description "Requirements entries"
-     :produces [{:media-type
-                 #{"text/html" "application/edn;q=0.9" "application/json;q=0.8" "application/transit+json;q=0.9"}
-                 :charset "UTF-8"}]
-     :methods
-     {:get {:parameters {:query {(s/optional-key :id) String}}
-            :swagger/tags ["default" "getters"]
-            :response (fn [ctx]
-                        (let [id (get-in ctx [:parameters :query :id])
-                              response (if (or (nil? id) (empty? id))                                
-                                         (db/get-projects db-spec)
-                                         (db/get-project-by-id db-spec {:id id}))]
-                          (case (yada/content-type ctx)
-                            "text/html" (project-page (server-send db-spec)))))}
-      :post {:consumes #{"application/transit+json;q=0.9"}
-             :produces #{"application/transit+json;q=0.9"}
-             :response (fn [ctx]                                                  
-                         (project-parser {:db-spec db-spec} (:body ctx)))}}}))
+  (let [configured-parser (partial project-parser {:db-spec db-spec})]
+    (yada/resource
+      {:id :playground.resources/projects-index
+       :description "Requirements entries"
+       :produces [{:media-type
+                   #{"text/html" "application/edn;q=0.9" "application/json;q=0.8" "application/transit+json;q=0.9"}
+                   :charset "UTF-8"}]
+       :methods
+       {:get {:parameters {:query {(s/optional-key :id) String}}
+              :swagger/tags ["default" "getters"]
+              :response (fn [ctx]
+                          (let [id (get-in ctx [:parameters :query :id])]
+                            (case (yada/content-type ctx)
+                              "text/html" (project-page (server-send configured-parser)))))}
+        :post {:consumes #{"application/transit+json;q=0.9"}
+               :produces #{"application/transit+json;q=0.9"}
+               :response (fn [ctx]                                                  
+                           (configured-parser (:body ctx)))}}})))
 
 (defn projects-routes
   [db-spec {:keys [port]}]  
@@ -110,4 +99,4 @@
                 :tags [{:name "getters"
                         :description "All paths that support GET"}]
                 :basePath ""})))
-         :edge.resources/projects-swagger)]]]))
+         :playground.resources/projects-swagger)]]]))

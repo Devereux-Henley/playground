@@ -1,11 +1,10 @@
 (ns playground.client.main
-  (:require 
-   [goog.dom :as gdom]
+  (:require    
    [om.next :as om]
-   [playground.shared.requirements :as r]))
+   [playground.shared.projects :as p]))
 
 (defn init
   []
-  (r/projects-init r/project-reconciler))
+  (p/projects-init p/project-reconciler))
 
 (init)

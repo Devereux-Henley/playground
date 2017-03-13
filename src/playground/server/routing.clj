@@ -2,10 +2,11 @@
   (:require [bidi.bidi :refer [tag]]
             [clojure.java.io :as io]
             [playground.server.projects :refer [projects-routes]]
+            [playground.shared.util :refer [server-send]]
             [yada.yada :refer [handler resource] :as yada]))
 
 (defn content-routes
-  []
+  [db-spec]
   ["/"
    [
     ["index.html"
@@ -26,6 +27,6 @@
   [""
    [    
     (projects-routes db config)
-    (content-routes)
+    (content-routes db)
     [true (handler nil)]]])
 
