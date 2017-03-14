@@ -3,7 +3,7 @@
    [bidi.bidi :as bidi]
    [hiccup.core :refer [html]]
    [hiccup.page :refer [include-js include-css]]
-   [om.next :as om]   
+   [om.next :as om]
    [playground.server.db.requirements :as db]
    [playground.shared.projects :as r]
    [playground.shared.util :refer [create-om-string server-send]]
@@ -14,7 +14,7 @@
 ;; Data Templating
 
 (defn sanitize-project-response
-  [response]    
+  [response]
   (mapv
     (fn [{:keys [name description]} cnt]
       [cnt {:project/name name :project/description description}])
@@ -22,17 +22,17 @@
     (iterate inc 1)))
 
 (defn project-page
-  [send-func]  
-  (let [reconciler (r/make-reconciler send-func)        
-        project-string (create-om-string reconciler r/ProjectList)]    
+  [send-func]
+  (let [reconciler (r/make-reconciler send-func)
+        project-string (create-om-string reconciler r/ProjectList)]
     (html
       [:head
        [:meta {:charset "utf-8"}]
        [:meta {:http-equiv "X-UA-Compatible"}]
        [:title "Projects List"]]
       [:body
-       [:section#projects project-string]       
-       (include-js "/playground.js")])))
+       [:section#projects project-string]
+       (include-js "/static/requirements.js")])))
 
 ;; Om.Next Parsing.
 
@@ -73,15 +73,15 @@
                               "text/html" (project-page (server-send configured-parser)))))}
         :post {:consumes #{"application/transit+json;q=0.9"}
                :produces #{"application/transit+json;q=0.9"}
-               :response (fn [ctx]                                                  
+               :response (fn [ctx]
                            (configured-parser (:body ctx)))}}})))
 
 (defn projects-routes
-  [db-spec {:keys [port]}]  
+  [db-spec {:keys [port]}]
   (let [routes ["/projects"
                 [
                  ["" (new-index-resource db-spec)]
-                 ["/" (new-index-resource db-spec)]]]]    
+                 ["/" (new-index-resource db-spec)]]]]
     [""
      [
       routes

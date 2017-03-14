@@ -1,0 +1,3 @@
+{:require [playground.client.administration]
+ :init-fns [playground.client.administration/init]
+ :compiler-options {}}

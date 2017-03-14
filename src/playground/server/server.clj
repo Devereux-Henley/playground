@@ -13,17 +13,17 @@
 (s/def ::server (s/keys :req [:playground.server.db/db]
                            :req-un [:unq/port :unq/listener]))
 
-(defrecord Server 
+(defrecord Server
   [port
    db
    listener]
   Lifecycle
-  (start 
+  (start
     [component]
-    (if 
+    (if
       listener
       component
-      (let 
+      (let
         [vhosts-model (vhosts-model
                         [{:scheme :http :host (format "localhost:%d" port)}
                          (routes db {:port port})])
@@ -32,7 +32,7 @@
         (assoc component :listener listener))))
   (stop
     [component]
-    (when-let 
+    (when-let
       [close (get-in component [:listener :close])]
       (close))
     (assoc component :listener nil)))

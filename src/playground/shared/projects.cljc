@@ -12,8 +12,8 @@
   (util/default-parser env key))
 
 (defmethod read-projects :projects/all-projects
-  [{:keys [state] :as env} key _]  
-  (let [st @state]    
+  [{:keys [state] :as env} key _]
+  (let [st @state]
     (if-let [[_ value] (find st key)]
       {:value value :remote (:ast env)}
       {:remote true})))
@@ -23,7 +23,7 @@
 (defmethod mutate-projects :default
   [_ _ _] {:remote true})
 
-(defui Project
+(defui ^:once Project
   static IQuery
   (query
     [this]
@@ -38,7 +38,7 @@
 
 (def project-factory (om/factory Project))
 
-(defui ProjectList
+(defui ^:once ProjectList
   static IQuery
   (query
     [this]
@@ -46,7 +46,7 @@
   Object
   (render
     [this]
-    (let [{:keys [organization/organization-name projects/all-projects]} (om/props this)]      
+    (let [{:keys [organization/organization-name projects/all-projects]} (om/props this)]
       (dom/div nil
         (dom/h2 nil organization-name)
         (apply dom/ul nil
@@ -67,7 +67,7 @@
         :send server-send})))
 
 #?(:cljs
-   (def project-reconciler
+   (defonce project-reconciler
      (om/reconciler
        {:state (atom {})
         :normalize true

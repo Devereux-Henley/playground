@@ -11,7 +11,7 @@
   [env key _]
   (util/default-parser env key))
 
-(defui SessionMenu
+(defui ^:once SessionMenu
   static IQuery
   (query
     [this]
@@ -27,7 +27,7 @@
 
 (def session-menu-factory (om/factory SessionMenu))
 
-(defui NavigationBar
+(defui ^:once NavigationBar
   static IQuery
   (query
     [this]
@@ -40,3 +40,24 @@
         (session-menu-factory session)))))
 
 (def navigation-bar-factory (om/factory NavigationBar))
+
+#?(:clj
+   (defn make-reconciler
+     [server-send]
+     {:state (atom {})
+      :normalize true
+      :parser (om/parser {:read read-navigation})
+      :send server-send}))
+
+#?(:cljs
+   (defonce navigation-reconciler
+     (om/reconciler
+      {:state (atom {})
+       :normalize true
+       :parser (om/parser {:read read-navigation})
+       :send (util/transit-post "/api/navigation")})))
+
+#?(:cljs
+   (defn navigation-init
+     [reconciler]
+     (om/add-root! reconciler NavigationBar (gdom/getElement "navigation"))))

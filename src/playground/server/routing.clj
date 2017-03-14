@@ -9,15 +9,15 @@
   [db-spec]
   ["/"
    [
-    ["index.html"
+    [""
      (yada/resource
        {:id :playground.resources/index
         :methods
         {:get
          {:produces #{"text/html"}
-          :response (fn [ctx] "<div> Hello World </div>")}}})]    
-    ["" (assoc (yada/redirect :playground.resources/index) :id :playground.resources/content)]
-    [""
+          :response (fn [ctx] "<div> Hello World </div>")}}})]
+    ["index.html" (assoc (yada/redirect :playground.resources/index) :id :playground.resources/content)]
+    ["static/"
      (->
        (yada/as-resource (io/file "static"))
        (assoc :id :playground.resources/static))]]])
@@ -25,8 +25,7 @@
 (defn routes
   [db config]
   [""
-   [    
+   [
     (projects-routes db config)
     (content-routes db)
     [true (handler nil)]]])
-
