@@ -76,7 +76,7 @@
   (set-env! :source-paths #(conj % "dev"))
 
   ;; Needed by tools.namespace to know where the source files are
-  (apply clojure.tools.namespace.repl/set-refresh-dirs  [(.getPath (io/file "src/playground/server"))])
+  (apply clojure.tools.namespace.repl/set-refresh-dirs  (map #(.getPath (io/file %)) ["src/playground/server" "src/playground/shared"]))
 
   (comp
    (watch)
