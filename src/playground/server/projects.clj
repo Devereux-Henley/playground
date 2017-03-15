@@ -32,7 +32,7 @@
        [:title "Projects List"]]
       [:body
        [:section#projects project-string]
-       (include-js "/static/requirements.js")])))
+       (include-js "/requirements.js")])))
 
 ;; Om.Next Parsing.
 

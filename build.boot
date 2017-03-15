@@ -19,13 +19,14 @@
 
    ;; Server deps
    [aero "1.0.3"]
-   [aleph "0.4.2-alpha10"]
+   [aleph "0.4.3"]
    [bidi "2.0.16"]
    [com.layerware/hugsql "0.4.7"]
    [hiccup "1.0.5"]
    [metosin/ring-swagger "0.22.12"]
    [mysql/mysql-connector-java "6.0.6"]
    [org.omcljs/om "1.0.0-alpha48"]
+   [org.clojure/tools.namespace "0.3.0-alpha3"]
    [prismatic/schema "1.1.3"]
    [yada "1.2.1"]
 
@@ -44,6 +45,7 @@
  '[adzerk.boot-reload :refer [reload]]
  '[com.stuartsierra.component :as component]
  '[clojure.tools.namespace.repl]
+ '[clojure.java.io :as io]
  '[playground.server.system :refer [new-system]])
 
 (def repl-port 5600)
@@ -70,15 +72,15 @@
 (deftask dev
   "This is the main development entry point."
   []
-  (set-env! :dependencies #(vec (concat % '[[reloaded.repl "0.2.1"]])))
+  (set-env! :dependencies #(vec (concat % '[[reloaded.repl "0.2.3"]])))
   (set-env! :source-paths #(conj % "dev"))
 
   ;; Needed by tools.namespace to know where the source files are
-  (apply clojure.tools.namespace.repl/set-refresh-dirs (get-env :directories))
+  (apply clojure.tools.namespace.repl/set-refresh-dirs  [(.getPath (io/file "src/playground/server"))])
 
   (comp
    (watch)
-   (reload :ids cljs-build-ids :cljs-asset-path "/static/")
+   (reload :ids cljs-build-ids)
    (cljs-repl :nrepl-opts {:client false
                            :port repl-port
                            :init-ns 'user}) ; this is also the server repl!
