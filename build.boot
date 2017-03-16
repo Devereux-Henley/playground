@@ -1,5 +1,5 @@
 (set-env!
- :source-paths #{"src"}
+ :source-paths #{"sass" "src"}
  :resource-paths #{"resources"}
  :asset-paths #{"assets"}
  :dependencies
@@ -8,6 +8,7 @@
    [adzerk/boot-cljs "1.7.228-1" :scope "test"]
    [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
    [adzerk/boot-reload "0.5.0" :scope "test"]
+   [deraen/boot-sass "0.3.0" :scope "test"]
    [weasel "0.7.0" :scope "test"] ;; Websocket Server
    [reloaded.repl "0.2.3" :scope "test"]
 
@@ -43,6 +44,7 @@
  '[adzerk.boot-cljs :refer [cljs]]
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload :refer [reload]]
+ '[deraen.boot-sass :refer [sass]]
  '[com.stuartsierra.component :as component]
  '[clojure.tools.namespace.repl]
  '[clojure.java.io :as io]
@@ -80,6 +82,7 @@
 
   (comp
    (watch)
+   (sass :output-style :expanded)
    (reload :ids cljs-build-ids)
    (cljs-repl :nrepl-opts {:client false
                            :port repl-port
@@ -92,6 +95,7 @@
   "This is used for creating optimized static resources under static"
   []
   (comp
+   (sass :output-style :compressed)
    (cljs :ids cljs-build-ids :optimizations :advanced)
    (target :dir #{"static"})))
 

@@ -32,9 +32,9 @@
   (render
     [this]
     (let [{:keys [project/name project/description]} (om/props this)]
-      (dom/div nil
-        (dom/p nil name)
-        (dom/p nil description)))))
+      (dom/div #js {:className "project"}
+        (dom/p #js {:className "project-name"} name)
+        (dom/p #js {:className "project-description"} description)))))
 
 (def project-factory (om/factory Project))
 
@@ -49,10 +49,10 @@
     (let [{:keys [organization/organization-name projects/all-projects]} (om/props this)]
       (dom/div nil
         (dom/h2 nil organization-name)
-        (apply dom/ul nil
+        (apply dom/ul #js {:className "project-list"}
           (map
             (fn [[_ project-data]]
-              (dom/li nil (project-factory project-data)))
+              (dom/li #js {:className "project-list-element"} (project-factory project-data)))
             all-projects))))))
 
 (def project-list-factory (om/factory ProjectList))

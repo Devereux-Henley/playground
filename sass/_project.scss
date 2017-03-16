@@ -1,0 +1,22 @@
+.project-text {
+    color: rgba(18, 255, 169, .97);
+    text-shadow: 0px 0px 15px rgba(34, 255, 169, 1);
+    border-color: rgba(82, 196, 138, .97);
+}
+
+.project-list {
+    background-color: black;
+    @extend .project-text;
+
+    .project {
+        background-color: black;
+
+        .project-name {
+            font-size: 12px;
+        }
+
+        .project-description {
+            font-size: 10px;
+        }
+    }
+}
