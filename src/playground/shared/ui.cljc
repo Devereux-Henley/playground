@@ -14,40 +14,41 @@
 (defui ^:once SessionMenu
   static IQuery
   (query
-    [this]
-    [:organization/organization-name :user/username :user/first-name :user/last-name])
+   [this]
+   [:organization/organization-name :user/username :user/first-name :user/last-name])
   Object
   (render
-    [this]
-    (let [{:keys [:organization/organization-name :user/username :user/first-name :user/last-name]} (om/props this)]
-      (dom/ul nil
-        (dom/li nil organization-name)
-        (dom/li nil username)
-        (dom/li nil (str first-name " " last-name))))))
+   [this]
+   (let [{:keys [:organization/organization-name :user/username :user/first-name :user/last-name]} (om/props this)]
+     (dom/ul nil
+             (dom/li nil organization-name)
+             (dom/li nil username)
+             (dom/li nil (str first-name " " last-name))))))
 
 (def session-menu-factory (om/factory SessionMenu))
 
 (defui ^:once NavigationBar
   static IQuery
   (query
-    [this]
-    [:user/session])
+   [this]
+   [:user/session])
   Object
   (render
-    [this]
-    (let [{:keys [:user/session]} (om/props this)]
-      (dom/nav nil
-        (session-menu-factory session)))))
+   [this]
+   (let [{:keys [:user/session]} (om/props this)]
+     (dom/nav nil
+              (session-menu-factory session)))))
 
 (def navigation-bar-factory (om/factory NavigationBar))
 
 #?(:clj
    (defn make-reconciler
      [server-send]
-     {:state (atom {})
-      :normalize true
-      :parser (om/parser {:read read-navigation})
-      :send server-send}))
+     (om/reconciler
+      {:state (atom {})
+       :normalize true
+       :parser (om/parser {:read read-navigation})
+       :send server-send})))
 
 #?(:cljs
    (defonce navigation-reconciler

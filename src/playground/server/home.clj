@@ -4,7 +4,7 @@
             [om.next :as om]))
 
 (defn home-page
-  [send-func]  
+  [send-func]
   (let [nav-string "foo"]
     (html
       [:head

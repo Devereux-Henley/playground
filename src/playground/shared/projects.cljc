@@ -72,7 +72,7 @@
        {:state (atom {})
         :normalize true
         :parser (om/parser {:read read-projects :mutate mutate-projects})
-        :send (util/transit-post "/projects")})))
+        :send (util/transit-post "/api/projects")})))
 
 #?(:cljs
    (defn projects-init
