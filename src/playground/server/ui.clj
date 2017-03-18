@@ -21,7 +21,7 @@
   {:value {:organization/organization-name "Server Sent Inc."
            :user/username "Devo"
            :user/first-name "Devereux"
-           :user/last-name "Devereux-Henley"}})
+           :user/last-name "Henley"}})
 
 (def navigation-parser
   (om/parser {:read read-navigation-data}))
