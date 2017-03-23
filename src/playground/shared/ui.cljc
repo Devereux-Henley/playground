@@ -20,12 +20,20 @@
   (render
    [this]
    (let [{:keys [:organization/organization-name :user/username :user/first-name :user/last-name]} (om/props this)]
-     (dom/ul nil
-             (dom/li nil organization-name)
-             (dom/li nil username)
-             (dom/li nil (str first-name " " last-name))))))
+     (dom/ul #js {:className "session-menu-list"}
+             (dom/a #js {:className "navigation-bar-link"} username)
+             (dom/li #js {:className "session-menu-item"} organization-name)
+             (dom/li #js {:className "session-menu-item"} (str first-name " " last-name))))))
 
 (def session-menu-factory (om/factory SessionMenu))
+
+(defui ^:once LoginMenu
+  Object
+  (render
+   [this]
+   (dom/a #js {:className "navigation-bar-link" :href "/login"} "Login")))
+
+(def login-menu-factory (om/factory LoginMenu))
 
 (defui ^:once NavigationBar
   static IQuery
@@ -36,8 +44,11 @@
   (render
    [this]
    (let [{:keys [:user/session]} (om/props this)]
-     (dom/nav nil
-              (session-menu-factory session)))))
+     (dom/nav #js {:className "navigation-bar"}
+              (dom/a #js {:className "navigation-bar-link"} "Home")
+              (dom/a #js {:className "navigation-bar-link"} "Cards")
+              (dom/a #js {:className "navigation-bar-link"} "Information")
+              (if (nil? session) (login-menu-factory) (session-menu-factory session))))))
 
 (def navigation-bar-factory (om/factory NavigationBar))
 

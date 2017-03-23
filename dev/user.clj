@@ -27,6 +27,11 @@
 
 (reloaded.repl/set-init! new-dev-system)
 
+(defn user-reset
+  []
+  (reset)
+  (reloaded.repl/set-init! new-dev-system))
+
 (defn check
   "Check for component validation errors"
   []

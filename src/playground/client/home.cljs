@@ -1,8 +1,8 @@
 (ns playground.client.home
   (:require
    [om.next :as om]
-   [playground.shared.projects :as p]))
+   [playground.shared.ui :as ui]))
 
 (defn init
   []
-  (p/projects-init p/project-reconciler))
+  (ui/navigation-init ui/navigation-reconciler))

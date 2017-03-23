@@ -13,7 +13,7 @@
    (defn server-send
      [parser-partial]
      (fn [{:keys [remote]} callback]
-       (let [response (parser-partial remote)]      
+       (let [response (parser-partial remote)]
          (callback response remote)))))
 
 #?(:cljs
@@ -21,7 +21,7 @@
      [url]
      (fn [{:keys [remote]} post-callback]
        (POST url
-         {:handler (fn [response]                     
+         {:handler (fn [response]
                      (post-callback response))
           :body (t/write (t/writer :json) remote)
           :format :transit
@@ -31,7 +31,7 @@
 
 (defn default-parser
   [{:keys [state] :as env} key]
-  (let [st @state]    
+  (let [st @state]
     (if-let [[_ value] (find st key)]
       {:value value :remote (:ast env)}
       {:remote true})))

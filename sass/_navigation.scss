@@ -1,0 +1,43 @@
+.navigation-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    min-width: 100px;
+    max-width: 150px;
+    width: 10vw;
+    height: 98vh;
+    float: left;
+    margin: 0;
+    padding-left: 2vw;
+    padding-top: 2vh;
+    background: black;
+    color: white;
+}
+
+.navigation-bar-link {
+    margin-bottom: 5px;
+}
+
+.session-menu-list {
+    list-style-type: none;
+    display: inline-block;
+    position: relative;
+    margin-bottom: 0px;
+    padding-left: 0px;
+    margin-top: 0px;
+}
+
+.session-menu-item {
+    display: none;
+    position: relative;
+}
+
+.session-menu-list:hover .session-menu-item {
+    display: block;
+}
+
+.session-menu {
+    display: flex;
+    flex-direction: column;
+}

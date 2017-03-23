@@ -19,12 +19,16 @@
    [com.stuartsierra/component "0.3.2"]
 
    ;; Server deps
-   [aero "1.0.3"]
+   [aero "1.1.2"]
    [aleph "0.4.3"]
    [bidi "2.0.16"]
+   [buddy "1.3.0"]
+   [clj-time "0.13.0"]
+   [compassus "1.0.0-alpha2"]
    [com.layerware/hugsql "0.4.7"]
    [hiccup "1.0.5"]
-   [metosin/ring-swagger "0.22.12"]
+   [kibu/pushy "0.3.7"]
+   [metosin/ring-swagger "0.23.0"]
    [mysql/mysql-connector-java "6.0.6"]
    [org.omcljs/om "1.0.0-alpha48"]
    [org.clojure/tools.namespace "0.3.0-alpha3"]
@@ -36,7 +40,11 @@
    [com.cognitect/transit-clj "0.8.297"]
 
    ;; Logging
-   [org.clojure/tools.logging "0.3.1"]])
+   [org.clojure/tools.logging "0.3.1"]
+   [org.slf4j/jcl-over-slf4j "1.7.21"]
+   [org.slf4j/jul-to-slf4j "1.7.21"]
+   [org.slf4j/log4j-over-slf4j "1.7.21"]
+   [ch.qos.logback/logback-classic "1.1.5" :exclusions [org.slf4j/slf4j-api]]])
 
 (load-data-readers!)
 
@@ -78,7 +86,7 @@
   (set-env! :source-paths #(conj % "dev"))
 
   ;; Needed by tools.namespace to know where the source files are
-  (apply clojure.tools.namespace.repl/set-refresh-dirs  (map #(.getPath (io/file %)) ["src/playground/server" "src/playground/shared"]))
+  (apply clojure.tools.namespace.repl/set-refresh-dirs  (map #(.getPath (io/file %)) ["dev" "src/playground/server" "src/playground/shared"]))
 
   (comp
    (watch)
