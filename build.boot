@@ -95,7 +95,10 @@
    (cljs-repl :nrepl-opts {:client false
                            :port repl-port
                            :init-ns 'user}) ; this is also the server repl!
-   (cljs :ids cljs-build-ids :optimizations :none)
+   (cljs
+     :ids cljs-build-ids
+     :optimizations :none
+     :compiler-options {:parallel-build true})
    (dev-system)
    (target :dir #{"static"})))
 

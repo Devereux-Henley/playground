@@ -1,29 +1,42 @@
 (ns playground.server.home
-  (:require [hiccup.core :refer [html]]
+  (:require
+   [compassus.core :as compassus]
+   [hiccup.core :refer [html]]
             [hiccup.page :refer [include-js include-css]]
             [om.next :as om]
+            [playground.shared.home :as home]
             [playground.server.ui :as backend-ui]
             [playground.shared.ui :as frontend-ui]
             [playground.shared.util :refer [create-om-string server-send]]
             [yada.yada :as yada]))
 
+(defmulti read-navigation-data om/dispatch)
+
+(defmethod read-navigation-data :default
+  [_ k _]
+  {:value {:error (str "No handler for key" k)}})
+
+(defmethod read-navigation-data :user/session
+  [_ _ _]
+  {:value {:organization/organization-name "Server Sent Inc."
+           :user/username "Devo"
+           :user/first-name "Devereux"
+           :user/last-name "Henley"}})
+
 (defn home-page
   [send-func]
-  (let [nav-reconciler (frontend-ui/make-reconciler send-func)
-        nav-string (create-om-string nav-reconciler frontend-ui/NavigationBar)]
+  (let [app (home/make-app send-func)
+        home-string (dom/render-to-str (compassus/mount! app nil))]
     (html
      [:head
       [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
       [:meta {:charset "utf-8"}]
       [:meta {:http-equiv "X-UA-Compatible"}]
+      (include-css "/home.css")
       [:title "Home"]]
      [:body
-      [:section#nav nav-string]
-      [:section#home
-       [:div
-        [:p "Welcome to the home page!"]]]
-      (include-js "/home.js")
-      (include-css "/home.css")])))
+      [:section#app home-string]
+      (include-js "/home.js")])))
 
 (defn new-home-index-resource
   [db-spec]

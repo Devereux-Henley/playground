@@ -35,7 +35,7 @@
 
 (def login-menu-factory (om/factory LoginMenu))
 
-(defui ^:once NavigationBar
+(defui ^:once NavigationWrapper
   static IQuery
   (query
    [this]
@@ -43,14 +43,16 @@
   Object
   (render
    [this]
-   (let [{:keys [:user/session]} (om/props this)]
+   (let [{:keys [:user/session]} (om/props this)
+         {:keys [owner factory props] (om/get-computed this)}]
      (dom/nav #js {:className "navigation-bar"}
               (dom/a #js {:className "navigation-bar-link"} "Home")
               (dom/a #js {:className "navigation-bar-link"} "Cards")
               (dom/a #js {:className "navigation-bar-link"} "Information")
-              (if (nil? session) (login-menu-factory) (session-menu-factory session))))))
+              (if (nil? session) (login-menu-factory) (session-menu-factory session))
+              (factory props)))))
 
-(def navigation-bar-factory (om/factory NavigationBar))
+(def navigation-bar-factory (om/factory NavigationWrapper))
 
 #?(:clj
    (defn make-reconciler
