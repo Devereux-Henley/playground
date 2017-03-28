@@ -11,14 +11,18 @@
    [playground.shared.util :as util]))
 
 (def routes
-  ["/" {""         :index
-        "home"     :index}])
+  ["/" {""         :route/index
+        "home"     :route/index}])
 
 (defmulti read-home om/dispatch)
 
 (defmethod read-home :default
-  [{:keys [state query]} _ _]
-  {:value (select-keys @state query)})
+  [{:keys [state] :as env} _ _]
+  (let [st @state]
+    (println st)
+    (if-let [[_ value] (find st key)]
+      {:value value :remote (:ast env)}
+      {:remote true})))
 
 (declare app)
 

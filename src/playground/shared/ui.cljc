@@ -45,12 +45,13 @@
    [this]
    (let [{:keys [:user/session]} (om/props this)
          {:keys [owner factory props]} (om/get-computed this)]
-     (dom/nav #js {:className "navigation-bar"}
-              (dom/a #js {:className "navigation-bar-link"} "Home")
-              (dom/a #js {:className "navigation-bar-link"} "Cards")
-              (dom/a #js {:className "navigation-bar-link"} "Information")
-              (if (nil? session) (login-menu-factory) (session-menu-factory session))
-              (factory props)))))
+     (dom/div nil
+       (dom/nav #js {:className "navigation-bar"}
+         (dom/a #js {:className "navigation-bar-link"} "Home")
+         (dom/a #js {:className "navigation-bar-link"} "Cards")
+         (dom/a #js {:className "navigation-bar-link"} "Information")
+         (if (nil? session) (login-menu-factory) (session-menu-factory session)))
+       (dom/div nil (factory props))))))
 
 (def navigation-bar-factory (om/factory NavigationWrapper))
 

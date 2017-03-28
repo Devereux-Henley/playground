@@ -72,9 +72,13 @@
 (deftask dev
   "This is the main development entry point."
   []
+
+  (clojure.tools.namespace.repl/set-refresh-dirs "src/playground/server" "src/playground/shared")
+
   (comp
    (watch)
    (sass :output-style :expanded)
+   (system :sys #'dev-system :auto true :files ["server.clj"])
    (reload :ids cljs-build-ids)
    (cljs-repl :nrepl-opts {:client false
                            :port repl-port}) ; this is also the server repl!
@@ -82,7 +86,6 @@
      :ids cljs-build-ids
      :optimizations :none
      :compiler-options {:parallel-build true})
-   (system :sys #'dev-system :auto true :files ["server.clj"])
    (target :dir #{"static"})))
 
 (deftask build

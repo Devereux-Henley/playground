@@ -24,6 +24,10 @@
            :user/first-name "Devereux"
            :user/last-name "Henley"}})
 
+(defmethod read-navigation-data :route/index
+  [env _ params]
+  {:value "Hey"})
+
 (defn home-page
   [send-func]
   (let [app (home/make-app send-func)
