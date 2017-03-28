@@ -27,7 +27,11 @@
 (defn new-system
   [profile]
   (let [config (config profile)]
-    (-> 
+    (->
       (new-system-map config)
       (configure-components config)
       (system-using (new-dependency-map)))))
+
+(defn dev-system
+  []
+  (new-system :dev))

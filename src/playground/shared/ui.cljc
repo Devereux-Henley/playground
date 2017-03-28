@@ -44,7 +44,7 @@
   (render
    [this]
    (let [{:keys [:user/session]} (om/props this)
-         {:keys [owner factory props] (om/get-computed this)}]
+         {:keys [owner factory props]} (om/get-computed this)]
      (dom/nav #js {:className "navigation-bar"}
               (dom/a #js {:className "navigation-bar-link"} "Home")
               (dom/a #js {:className "navigation-bar-link"} "Cards")
@@ -74,4 +74,4 @@
 #?(:cljs
    (defn navigation-init
      [reconciler]
-     (om/add-root! reconciler NavigationBar (gdom/getElement "navigation"))))
+     (om/add-root! reconciler NavigationWrapper (gdom/getElement "navigation"))))

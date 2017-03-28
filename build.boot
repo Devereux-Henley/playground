@@ -30,7 +30,8 @@
    [kibu/pushy "0.3.7"]
    [metosin/ring-swagger "0.23.0"]
    [mysql/mysql-connector-java "6.0.6"]
-   [org.omcljs/om "1.0.0-alpha48"]
+   [org.danielsz/system "0.4.0"]
+   [org.omcljs/om "1.0.0-alpha47"]
    [org.clojure/tools.namespace "0.3.0-alpha3"]
    [prismatic/schema "1.1.3"]
    [yada "1.2.1"]
@@ -56,7 +57,8 @@
  '[com.stuartsierra.component :as component]
  '[clojure.tools.namespace.repl]
  '[clojure.java.io :as io]
- '[playground.server.system :refer [new-system]])
+ '[playground.server.system :refer [new-system dev-system]]
+ '[system.boot :refer [system run]])
 
 (def repl-port 5600)
 (def cljs-build-ids #{"home" "administration" "requirements"})
@@ -65,41 +67,22 @@
  repl {:client true
        :port repl-port})
 
-(deftask dev-system
-  "Develop the server backend. The system is automatically started in
-  the dev profile."
-  []
-  (with-pass-thru _
-    (require 'reloaded.repl)
-    (let [go (resolve 'reloaded.repl/go)]
-      (try
-        (require 'user)
-        (go)
-        (catch Exception e
-          (boot.util/fail "Exception while starting the system\n")
-          (boot.util/print-ex e))))))
+(deftask deps [])
 
 (deftask dev
   "This is the main development entry point."
   []
-  (set-env! :dependencies #(vec (concat % '[[reloaded.repl "0.2.3"]])))
-  (set-env! :source-paths #(conj % "dev"))
-
-  ;; Needed by tools.namespace to know where the source files are
-  (apply clojure.tools.namespace.repl/set-refresh-dirs  (map #(.getPath (io/file %)) ["dev" "src/playground/server" "src/playground/shared"]))
-
   (comp
    (watch)
    (sass :output-style :expanded)
    (reload :ids cljs-build-ids)
    (cljs-repl :nrepl-opts {:client false
-                           :port repl-port
-                           :init-ns 'user}) ; this is also the server repl!
+                           :port repl-port}) ; this is also the server repl!
    (cljs
      :ids cljs-build-ids
      :optimizations :none
      :compiler-options {:parallel-build true})
-   (dev-system)
+   (system :sys #'dev-system :auto true :files ["server.clj"])
    (target :dir #{"static"})))
 
 (deftask build
@@ -118,7 +101,7 @@
     (with-pre-wrap fileset
       (assoc fileset :system system))))
 
-(deftask run [p profile VAL kw "Profile"]
+(deftask run! [p profile VAL kw "Profile"]
   (comp
    (repl :server true
          :port (case profile :prod 5601 :beta 5602 5600)

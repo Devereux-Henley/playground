@@ -28,7 +28,7 @@
   (let [project-reconciler (r/make-reconciler rec-send-func)
         project-string (create-om-string project-reconciler r/ProjectList)
         ui-reconciler (frontend-ui/make-reconciler ui-send-func)
-        ui-string (create-om-string ui-reconciler frontend-ui/NavigationBar)]
+        ui-string (create-om-string ui-reconciler frontend-ui/NavigationWrapper)]
     (html
      [:head
       [:meta {:charset "utf-8"}]
