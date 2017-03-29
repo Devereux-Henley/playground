@@ -17,9 +17,8 @@
 (defmulti read-home om/dispatch)
 
 (defmethod read-home :default
-  [{:keys [state] :as env} _ _]
+  [{:keys [state] :as env} key _]
   (let [st @state]
-    (println st)
     (if-let [[_ value] (find st key)]
       {:value value :remote (:ast env)}
       {:remote true})))
@@ -29,6 +28,7 @@
 #?(:cljs
    (defn update-route!
      [{:keys [handler] :as route}]
+     (.log js/console "Dispatching on route!")
      (let [current-route (compassus/current-route app)]
        (when (not= handler current-route)
          (compassus/set-route! app handler)))))
@@ -41,6 +41,10 @@
 (def route-map
   {:route/index index/IndexPage})
 
+(defn make-home-parser
+  []
+  (compassus/parser {:read read-home}))
+
 #?(:clj
    (defn make-app
      [server-send]
@@ -49,7 +53,7 @@
         :index-route :route/index
         :reconciler (om/reconciler
                       {:state (atom {})
-                       :parser (compassus/parser {:read read-home})
+                       :parser (make-home-parser)
                        :normalize true
                        :send server-send})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)]})))
@@ -61,9 +65,9 @@
         :index-route :route/index
         :reconciler (om/reconciler
                       {:state (atom {})
-                       :parser (compassus/parser {:read read-home})
+                       :parser (make-home-parser)
                        :normalize true
-                       :send (util/transit-post "/api/navigation")})
+                       :send (util/transit-post "/api/home")})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)
                  (compassus/did-mount (fn [_] (pushy/start! history)))
                  (compassus/will-unmount (fn [_] (pushy/stop! history)))]})))

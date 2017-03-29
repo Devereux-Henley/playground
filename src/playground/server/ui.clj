@@ -24,8 +24,11 @@
            :user/last-name "Henley"}})
 
 (defmethod read-navigation-data :route/index
-  [env _ params]
-  {:value (read-navigation-data env :user/session params)})
+  [_ _ _]
+  {:value {:user/session {:organization/organization-name "Server Sent Inc."
+                          :user/username "Devo"
+                          :user/first-name "Devereux"
+                          :user/last-name "Henley"}}})
 
 (def navigation-parser
   (om/parser {:read read-navigation-data}))

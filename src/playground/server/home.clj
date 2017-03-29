@@ -6,27 +6,38 @@
    [om.dom :as dom]
    [om.next :as om]
    [playground.shared.home :as home]
-   [playground.server.ui :as backend-ui]
-   [playground.shared.ui :as frontend-ui]
    [playground.shared.util :refer [create-om-string server-send]]
    [yada.yada :as yada]))
 
-(defmulti read-navigation-data om/dispatch)
+(defmulti read-home-data om/dispatch)
 
-(defmethod read-navigation-data :default
+(defmethod read-home-data :default
   [_ k _]
   {:value {:error (str "No handler for key" k)}})
 
-(defmethod read-navigation-data :user/session
-  [_ _ _]
+(defmethod read-home-data :user/session
+  [env _ params]
   {:value {:organization/organization-name "Server Sent Inc."
            :user/username "Devo"
            :user/first-name "Devereux"
            :user/last-name "Henley"}})
 
-(defmethod read-navigation-data :route/index
+(defmethod read-home-data :route/index
   [env _ params]
-  {:value "Hey"})
+  {:value {:user/session {:organization/organization-name "Server Sent Inc."
+                          :user/username "Devo"
+                          :user/first-name "Devereux"
+                          :user/last-name "Henley"}}})
+
+(defmulti mutate-home-data om/dispatch)
+
+(defmethod mutate-home-data :default
+  [_ _ _]
+  {:value {:error "Cannot mutate this data."}})
+
+(def home-parser
+  (compassus/parser {:read read-home-data
+                     :mutate mutate-home-data}))
 
 (defn home-page
   [send-func]
@@ -45,7 +56,7 @@
 
 (defn new-home-index-resource
   [db-spec]
-  (let [navigation-parser (partial backend-ui/navigation-parser {:db-spec db-spec})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec :state (atom {})})]
     (yada/resource
       {:id :playground.resources/index
        :description "Serves home SPA."
@@ -56,7 +67,21 @@
        {:get {:response (fn [ctx]
                           (case (yada/content-type ctx)
                             "text/html" (home-page
-                                          (server-send navigation-parser))))}}})))
+                                          (server-send configured-parser))))}}})))
+
+(defn home-post-resource
+  [db-spec]
+  (let [configured-parser (partial home-parser {:db-spec db-spec :state (atom {})})]
+    (yada/resource
+      {:id :playground.resources/home-sync-post
+       :description "Post route for syncing remote with home state."
+       :produces [{:media-type #{"application/json;q=0.9" "application/edn;q=0.9" "application/transit+json;q=0.9"}
+                   :charset "UTF-8"}]
+       :methods
+       {:post {:consumes #{"application/transit+json;q=0.9"}
+               :produces #{"application/transit+json;q=0.9"}
+               :response (fn [ctx]
+                           (configured-parser (:body ctx)))}}})))
 
 (defn home-content-routes
   [db-spec {:keys [port]}]
@@ -68,4 +93,16 @@
     [""
      [
       content-routes
+      ]]))
+
+(defn home-api-routes
+  [db-spec {:keys [port]}]
+  (let [api-routes ["/home"
+                    [
+                     ["" (home-post-resource db-spec)]
+                     ["/" (home-post-resource db-spec)]
+                     ]]]
+    [""
+     [
+      api-routes
       ]]))

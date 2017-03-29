@@ -11,47 +11,47 @@
   [env key _]
   (util/default-parser env key))
 
-(defui ^:once SessionMenu
+(defui SessionMenu
   static IQuery
   (query
-   [this]
-   [:organization/organization-name :user/username :user/first-name :user/last-name])
+    [this]
+    [:organization/organization-name :user/username :user/first-name :user/last-name])
   Object
   (render
-   [this]
-   (let [{:keys [:organization/organization-name :user/username :user/first-name :user/last-name]} (om/props this)]
-     (dom/ul #js {:className "session-menu-list"}
-             (dom/a #js {:className "navigation-bar-link"} username)
-             (dom/li #js {:className "session-menu-item"} organization-name)
-             (dom/li #js {:className "session-menu-item"} (str first-name " " last-name))))))
+    [this]
+    (let [{:keys [:organization/organization-name :user/username :user/first-name :user/last-name]} (om/props this)]
+      (dom/ul #js {:className "session-menu-list"}
+        (dom/a #js {:className "navigation-bar-link"} username)
+        (dom/li #js {:className "session-menu-item"} organization-name)
+        (dom/li #js {:className "session-menu-item"} (str first-name " " last-name))))))
 
 (def session-menu-factory (om/factory SessionMenu))
 
-(defui ^:once LoginMenu
+(defui LoginMenu
   Object
   (render
-   [this]
-   (dom/a #js {:className "navigation-bar-link" :href "/login"} "Login")))
+    [this]
+    (dom/a #js {:className "navigation-bar-link" :href "/login"} "Login")))
 
 (def login-menu-factory (om/factory LoginMenu))
 
-(defui ^:once NavigationWrapper
+(defui NavigationWrapper
   static IQuery
   (query
-   [this]
-   [:user/session])
+    [this]
+    [:user/session])
   Object
   (render
-   [this]
-   (let [{:keys [:user/session]} (om/props this)
-         {:keys [owner factory props]} (om/get-computed this)]
-     (dom/div nil
-       (dom/nav #js {:className "navigation-bar"}
-         (dom/a #js {:className "navigation-bar-link"} "Home")
-         (dom/a #js {:className "navigation-bar-link"} "Cards")
-         (dom/a #js {:className "navigation-bar-link"} "Information")
-         (if (nil? session) (login-menu-factory) (session-menu-factory session)))
-       (dom/div nil (factory props))))))
+    [this]
+    (let [{:keys [:user/session]} (om/props this)
+          {:keys [owner factory props]} (om/get-computed this)]
+      (dom/div nil
+        (dom/nav #js {:className "navigation-bar"}
+          (dom/a #js {:className "navigation-bar-link"} "Home")
+          (dom/a #js {:className "navigation-bar-link"} "Cards")
+          (dom/a #js {:className "navigation-bar-link"} "Information")
+          (if (nil? session) (login-menu-factory) (session-menu-factory session)))
+        (dom/div nil (factory props))))))
 
 (def navigation-bar-factory (om/factory NavigationWrapper))
 
@@ -59,18 +59,18 @@
    (defn make-reconciler
      [server-send]
      (om/reconciler
-      {:state (atom {})
-       :normalize true
-       :parser (om/parser {:read read-navigation})
-       :send server-send})))
+       {:state (atom {})
+        :normalize true
+        :parser (om/parser {:read read-navigation})
+        :send server-send})))
 
 #?(:cljs
    (defonce navigation-reconciler
      (om/reconciler
-      {:state (atom {})
-       :normalize true
-       :parser (om/parser {:read read-navigation})
-       :send (util/transit-post "/api/navigation")})))
+       {:state (atom {})
+        :normalize true
+        :parser (om/parser {:read read-navigation})
+        :send (util/transit-post "/api/navigation")})))
 
 #?(:cljs
    (defn navigation-init

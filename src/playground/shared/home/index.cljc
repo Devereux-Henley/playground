@@ -2,11 +2,7 @@
   (:require [om.dom :as dom]
             [om.next :as om :refer [IQuery IQueryParams defui]]))
 
-(defui ^:once IndexPage
-  static IQuery
-  (query
-    [this]
-    [:user/session])
+(defui IndexPage
   Object
   (render
     [this]
