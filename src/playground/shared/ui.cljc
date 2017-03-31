@@ -8,8 +8,8 @@
 (defmulti read-navigation om/dispatch)
 
 (defmethod read-navigation :default
-  [env key _]
-  (util/default-parser env key))
+  [env key params]
+  (util/default-parser env key params))
 
 (defui SessionMenu
   static IQuery
@@ -50,7 +50,7 @@
           (dom/a #js {:className "navigation-bar-link"} "Home")
           (dom/a #js {:className "navigation-bar-link"} "Cards")
           (dom/a #js {:className "navigation-bar-link"} "Information")
-          (if (nil? session) (login-menu-factory) (session-menu-factory session)))
+          (if session (session-menu-factory session) (login-menu-factory)))
         (dom/div nil (factory props))))))
 
 (def navigation-bar-factory (om/factory NavigationWrapper))

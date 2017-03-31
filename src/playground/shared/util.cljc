@@ -12,26 +12,27 @@
 #?(:clj
    (defn server-send
      [parser-partial]
-     (fn [{:keys [remote]} callback]
-       (let [response (parser-partial remote)]
-         (callback response remote)))))
+     (fn [{:keys [backend-remote]} callback]
+       (println backend-remote)
+       (let [response (parser-partial backend-remote)]
+         (callback response)))))
 
 #?(:cljs
    (defn transit-post
      [url]
-     (fn [{:keys [remote]} post-callback]
+     (fn [{:keys [backend-remote]} post-callback]
        (POST url
          {:handler (fn [response]
                      (post-callback response))
-          :body (t/write (t/writer :json) remote)
+          :body (t/write (t/writer :json) backend-remote)
           :format :transit
           :params :transit
           :response-format :transit
           :headers {:content-type "application/transit+json"}}))))
 
 (defn default-parser
-  [{:keys [state] :as env} key]
+  [{:keys [state query target ast] :as env} _ _]
   (let [st @state]
-    (if-let [[_ value] (find st key)]
-      {:value value :remote (:ast env)}
-      {:remote true})))
+    (if (some st query)
+      {:value st}
+      {target true})))

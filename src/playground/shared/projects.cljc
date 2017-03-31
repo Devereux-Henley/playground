@@ -8,8 +8,8 @@
 (defmulti read-projects om/dispatch)
 
 (defmethod read-projects :default
-  [env key _]
-  (util/default-parser env key))
+  [env key params]
+  (util/default-parser env key params))
 
 (defmethod read-projects :projects/all-projects
   [{:keys [state] :as env} key _]

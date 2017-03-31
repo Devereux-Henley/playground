@@ -16,18 +16,15 @@
   {:value {:error (str "No handler for key" k)}})
 
 (defmethod read-home-data :user/session
-  [env _ params]
+  [{:keys [state query target] :as env} _ _]
   {:value {:organization/organization-name "Server Sent Inc."
            :user/username "Devo"
            :user/first-name "Devereux"
            :user/last-name "Henley"}})
 
 (defmethod read-home-data :route/index
-  [env _ params]
-  {:value {:user/session {:organization/organization-name "Server Sent Inc."
-                          :user/username "Devo"
-                          :user/first-name "Devereux"
-                          :user/last-name "Henley"}}})
+  [{:keys [state query target] :as env} _ _]
+  {:value (select-keys @state query)})
 
 (defmulti mutate-home-data om/dispatch)
 
@@ -36,13 +33,13 @@
   {:value {:error "Cannot mutate this data."}})
 
 (def home-parser
-  (compassus/parser {:read read-home-data
-                     :mutate mutate-home-data}))
+  (om/parser {:read read-home-data
+              :mutate mutate-home-data}))
 
 (defn home-page
   [send-func]
   (let [app (home/make-app send-func)
-        home-string (dom/render-to-str (compassus/mount! app nil))]
+        mounted-app (compassus/mount! app nil)]
     (html
       [:head
        [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
@@ -51,12 +48,12 @@
        (include-css "/home.css")
        [:title "Home"]]
       [:body
-       [:section#app home-string]
+       [:section#app (dom/render-to-str mounted-app)]
        (include-js "/home.js")])))
 
 (defn new-home-index-resource
   [db-spec]
-  (let [configured-parser (partial home-parser {:db-spec db-spec :state (atom {})})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec})]
     (yada/resource
       {:id :playground.resources/index
        :description "Serves home SPA."
@@ -71,7 +68,8 @@
 
 (defn home-post-resource
   [db-spec]
-  (let [configured-parser (partial home-parser {:db-spec db-spec :state (atom {})})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec
+                                          :state (atom {})})]
     (yada/resource
       {:id :playground.resources/home-sync-post
        :description "Post route for syncing remote with home state."

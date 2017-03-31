@@ -16,22 +16,29 @@
 
 (defmulti read-home om/dispatch)
 
-(defmethod read-home :default
-  [{:keys [state] :as env} key _]
+(defmethod read-home :route/index
+  [{:keys [state query target ast] :as env} _ _]
+  (let [st @state]
+    (if (some st query)
+      {:value (select-keys st query)}
+      {:backend-remote true})))
+
+(defmethod read-home :user/session
+  [{:keys [state query target ast] :as env} key _]
+  (println env)
   (let [st @state]
     (if-let [[_ value] (find st key)]
-      {:value value :remote (:ast env)}
-      {:remote true})))
+      {:value value :backend-remote ast}
+      {:backend-remote true})))
 
 (declare app)
 
 #?(:cljs
    (defn update-route!
      [{:keys [handler] :as route}]
-     (.log js/console "Dispatching on route!")
      (let [current-route (compassus/current-route app)]
-       (when (not= handler current-route)
-         (compassus/set-route! app handler)))))
+      (when (not= handler current-route)
+        (compassus/set-route! app handler)))))
 
 #?(:cljs
    (def history
@@ -54,7 +61,7 @@
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser (make-home-parser)
-                       :normalize true
+                       :remotes [:backend-remote]
                        :send server-send})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)]})))
 
@@ -66,7 +73,7 @@
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser (make-home-parser)
-                       :normalize true
+                       :remotes [:backend-remote]
                        :send (util/transit-post "/api/home")})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)
                  (compassus/did-mount (fn [_] (pushy/start! history)))
