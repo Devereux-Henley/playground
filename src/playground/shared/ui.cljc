@@ -19,7 +19,7 @@
   Object
   (render
     [this]
-    (let [{:keys [:organization/organization-name :user/username :user/first-name :user/last-name]} (om/props this)]
+    (let [{:keys [organization/organization-name user/username user/first-name user/last-name]} (om/props this)]
       (dom/ul #js {:className "session-menu-list"}
         (dom/a #js {:className "navigation-bar-link"} username)
         (dom/li #js {:className "session-menu-item"} organization-name)
@@ -43,9 +43,10 @@
   Object
   (render
     [this]
-    (let [{:keys [:user/session]} (om/props this)
-          {:keys [owner factory props]} (om/get-computed this)]
-      (dom/div nil
+    (let [{:keys [user/session]} (om/props this)
+          {:keys [owner factory props] :as computed} (om/get-computed this)]
+      (println computed)
+      (dom/div #js {:className "app-container"}
         (dom/nav #js {:className "navigation-bar"}
           (dom/a #js {:className "navigation-bar-link"} "Home")
           (dom/a #js {:className "navigation-bar-link"} "Cards")

@@ -6,15 +6,11 @@
  '[[org.clojure/clojure "1.9.0-alpha14"]
    [org.clojure/clojurescript "1.9.494"]
    [adzerk/boot-cljs "1.7.228-1" :scope "test"]
-   [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
    [adzerk/boot-reload "0.5.0" :scope "test"]
    [deraen/boot-sass "0.3.0" :scope "test"]
-   [weasel "0.7.0" :scope "test"] ;; Websocket Server
    [reloaded.repl "0.2.3" :scope "test"]
 
    [org.clojure/tools.nrepl "0.2.12" :scope "test"]
-   ;; Needed for start-repl in cljs repl
-   [com.cemerick/piggieback "0.2.1" :scope "test"]
 
    [com.stuartsierra/component "0.3.2"]
 
@@ -22,6 +18,8 @@
    [aero "1.1.2"]
    [aleph "0.4.3"]
    [bidi "2.0.16"]
+   [binaryage/dirac "1.2.3" :scope "test"]
+   [binaryage/devtools "0.9.2" :scope "test"]
    [buddy "1.3.0"]
    [clj-time "0.13.0"]
    [compassus "1.0.0-alpha2"]
@@ -33,6 +31,7 @@
    [org.danielsz/system "0.4.0"]
    [org.omcljs/om "1.0.0-alpha47"]
    [org.clojure/tools.namespace "0.3.0-alpha3"]
+   [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
    [prismatic/schema "1.1.3"]
    [yada "1.2.1"]
 
@@ -51,13 +50,13 @@
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
- '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload :refer [reload]]
  '[deraen.boot-sass :refer [sass]]
  '[com.stuartsierra.component :as component]
  '[clojure.tools.namespace.repl]
  '[clojure.java.io :as io]
  '[playground.server.system :refer [new-system dev-system]]
+ '[powerlaces.boot-cljs-devtools :refer [cljs-devtools dirac]]
  '[system.boot :refer [system run]])
 
 (def repl-port 5600)
@@ -80,8 +79,8 @@
    (sass :output-style :expanded)
    (system :sys #'dev-system :auto true :files ["server.clj"])
    (reload :ids cljs-build-ids)
-   (cljs-repl :nrepl-opts {:client false
-                           :port repl-port}) ; this is also the server repl!
+   (cljs-devtools)
+   (dirac)
    (cljs
      :ids cljs-build-ids
      :optimizations :none

@@ -24,7 +24,10 @@
 
 (defmethod read-home-data :route/index
   [{:keys [state query target] :as env} _ _]
-  {:value (select-keys @state query)})
+  {:value {:user/session {:organization/organization-name "Hello"
+                          :user/username "Mevo"
+                          :user/first-name "Gooby"
+                          :user/last-name "Gooberson"}}})
 
 (defmulti mutate-home-data om/dispatch)
 
@@ -33,8 +36,8 @@
   {:value {:error "Cannot mutate this data."}})
 
 (def home-parser
-  (om/parser {:read read-home-data
-              :mutate mutate-home-data}))
+  (compassus/parser {:read read-home-data
+                     :mutate mutate-home-data}))
 
 (defn home-page
   [send-func]
@@ -53,7 +56,8 @@
 
 (defn new-home-index-resource
   [db-spec]
-  (let [configured-parser (partial home-parser {:db-spec db-spec})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec
+                                          :state (atom {})})]
     (yada/resource
       {:id :playground.resources/index
        :description "Serves home SPA."

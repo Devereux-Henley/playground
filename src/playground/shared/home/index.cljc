@@ -7,5 +7,5 @@
   (render
     [this]
     (dom/div #js {:className "main"}
-      (dom/div nil "Navigation")
-      (dom/div nil "Home"))))
+     (dom/div nil "Navigation")
+     (dom/div nil "Home"))))

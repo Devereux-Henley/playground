@@ -12,8 +12,7 @@
 #?(:clj
    (defn server-send
      [parser-partial]
-     (fn [{:keys [backend-remote]} callback]
-       (println backend-remote)
+     (fn [{:keys [backend-remote] :as env} callback]
        (let [response (parser-partial backend-remote)]
          (callback response)))))
 
@@ -23,6 +22,7 @@
      (fn [{:keys [backend-remote]} post-callback]
        (POST url
          {:handler (fn [response]
+                     (.log js/console response)
                      (post-callback response))
           :body (t/write (t/writer :json) backend-remote)
           :format :transit

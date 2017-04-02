@@ -21,15 +21,15 @@
   (let [st @state]
     (if (some st query)
       {:value (select-keys st query)}
-      {:backend-remote true})))
+      {:backend-remote ast})))
 
 (defmethod read-home :user/session
   [{:keys [state query target ast] :as env} key _]
-  (println env)
   (let [st @state]
+    (println env)
     (if-let [[_ value] (find st key)]
       {:value value :backend-remote ast}
-      {:backend-remote true})))
+      {:backend-remote ast})))
 
 (declare app)
 
