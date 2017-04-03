@@ -14,6 +14,6 @@
     (do
       (compassus/mount! home/app (gdom/getElement "app"))
       (swap! mounted? not))
-    (let [route->component (-> home/app :config :route-component)
+    (let [route->component (-> home/app :config :route->component)
           component (om/class->any (compassus/get-reconciler home/app) (get route->component (compassus/current-route home/app)))]
       (.forceUpdate component))))

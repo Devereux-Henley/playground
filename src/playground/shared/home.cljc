@@ -11,8 +11,6 @@
    [playground.shared.ui :as ui]
    [playground.shared.util :as util]))
 
-#?(:cljs (log/log-to-console!))
-
 (def routes
   ["/" {""         :route/index
         "home"     :route/index}])

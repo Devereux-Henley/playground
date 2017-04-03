@@ -1,15 +1,7 @@
 (ns playground.shared.ui
   (:require
-   #?(:cljs [goog.dom :as gdom])
    [om.dom :as dom]
-   [om.next :as om :refer [IQuery IQueryParams defui]]
-   [playground.shared.util :as util]))
-
-(defmulti read-navigation om/dispatch)
-
-(defmethod read-navigation :default
-  [env key params]
-  (util/default-parser env key params))
+   [om.next :as om :refer [IQuery IQueryParams defui]]))
 
 (defui SessionMenu
   static IQuery
@@ -54,25 +46,3 @@
         (dom/div nil (factory props))))))
 
 (def navigation-bar-factory (om/factory NavigationWrapper))
-
-#?(:clj
-   (defn make-reconciler
-     [server-send]
-     (om/reconciler
-       {:state (atom {})
-        :normalize true
-        :parser (om/parser {:read read-navigation})
-        :send server-send})))
-
-#?(:cljs
-   (defonce navigation-reconciler
-     (om/reconciler
-       {:state (atom {})
-        :normalize true
-        :parser (om/parser {:read read-navigation})
-        :send (util/transit-post "/api/navigation")})))
-
-#?(:cljs
-   (defn navigation-init
-     [reconciler]
-     (om/add-root! reconciler NavigationWrapper (gdom/getElement "navigation"))))

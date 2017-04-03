@@ -4,10 +4,8 @@
    [hiccup.core :refer [html]]
    [hiccup.page :refer [include-js include-css]]
    [om.next :as om]
-   [playground.server.ui :as backend-ui]
    [playground.server.db.requirements :as db]
    [playground.shared.projects :as r]
-   [playground.shared.ui :as frontend-ui]
    [playground.shared.util :refer [create-om-string server-send]]
    [schema.core :as s]
    [yada.swagger :as swagger]
@@ -24,18 +22,15 @@
    (iterate inc 1)))
 
 (defn project-page
-  [rec-send-func ui-send-func]
+  [rec-send-func]
   (let [project-reconciler (r/make-reconciler rec-send-func)
-        project-string (create-om-string project-reconciler r/ProjectList)
-        ui-reconciler (frontend-ui/make-reconciler ui-send-func)
-        ui-string (create-om-string ui-reconciler frontend-ui/NavigationWrapper)]
+        project-string (create-om-string project-reconciler r/ProjectList)]
     (html
      [:head
       [:meta {:charset "utf-8"}]
       [:meta {:http-equiv "X-UA-Compatible"}]
       [:title "Projects List"]]
      [:body
-      [:section#navigation ui-string]
       [:section#projects project-string]
       (include-js "/requirements.js")
       (include-css "/requirements.css")])))
@@ -63,8 +58,7 @@
 
 (defn new-index-resource
   [db-spec]
-  (let [configured-parser (partial project-parser {:db-spec db-spec})
-        navigation-parser (partial backend-ui/navigation-parser {:db-spec db-spec})]
+  (let [configured-parser (partial project-parser {:db-spec db-spec})]
     (yada/resource
      {:id :playground.resources/projects-index
       :description "Requirements entries"
@@ -78,8 +72,7 @@
                          (let [id (get-in ctx [:parameters :query :id])]
                            (case (yada/content-type ctx)
                              "text/html" (project-page
-                                          (server-send configured-parser)
-                                          (server-send navigation-parser)))))}
+                                          (server-send configured-parser)))))}
        :post {:consumes #{"application/transit+json;q=0.9"}
               :produces #{"application/transit+json;q=0.9"}
               :response (fn [ctx]
