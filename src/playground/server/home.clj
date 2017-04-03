@@ -16,18 +16,15 @@
   {:value {:error (str "No handler for key" k)}})
 
 (defmethod read-home-data :user/session
-  [{:keys [state query target] :as env} _ _]
+  [{:keys [state query] :as env} _ _]
   {:value {:organization/organization-name "Server Sent Inc."
            :user/username "Devo"
            :user/first-name "Devereux"
            :user/last-name "Henley"}})
 
 (defmethod read-home-data :route/index
-  [{:keys [state query target] :as env} _ _]
-  {:value {:user/session {:organization/organization-name "Hello"
-                          :user/username "Mevo"
-                          :user/first-name "Gooby"
-                          :user/last-name "Gooberson"}}})
+  [{:keys [state query] :as env} key params]
+  {:value {:index/title "Not Home"}})
 
 (defmulti mutate-home-data om/dispatch)
 
@@ -36,8 +33,8 @@
   {:value {:error "Cannot mutate this data."}})
 
 (def home-parser
-  (compassus/parser {:read read-home-data
-                     :mutate mutate-home-data}))
+  (om/parser {:read read-home-data
+              :mutate mutate-home-data}))
 
 (defn home-page
   [send-func]
@@ -56,8 +53,7 @@
 
 (defn new-home-index-resource
   [db-spec]
-  (let [configured-parser (partial home-parser {:db-spec db-spec
-                                          :state (atom {})})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec})]
     (yada/resource
       {:id :playground.resources/index
        :description "Serves home SPA."
@@ -72,8 +68,7 @@
 
 (defn home-post-resource
   [db-spec]
-  (let [configured-parser (partial home-parser {:db-spec db-spec
-                                          :state (atom {})})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec})]
     (yada/resource
       {:id :playground.resources/home-sync-post
        :description "Post route for syncing remote with home state."

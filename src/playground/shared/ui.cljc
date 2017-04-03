@@ -45,7 +45,6 @@
     [this]
     (let [{:keys [user/session]} (om/props this)
           {:keys [owner factory props] :as computed} (om/get-computed this)]
-      (println computed)
       (dom/div #js {:className "app-container"}
         (dom/nav #js {:className "navigation-bar"}
           (dom/a #js {:className "navigation-bar-link"} "Home")

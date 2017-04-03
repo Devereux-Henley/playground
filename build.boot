@@ -63,7 +63,7 @@
 (def cljs-build-ids #{"home" "administration" "requirements"})
 
 (task-options!
- repl {:client true
+ repl {:client false
        :port repl-port})
 
 (deftask deps [])
@@ -78,9 +78,9 @@
    (watch)
    (sass :output-style :expanded)
    (system :sys #'dev-system :auto true :files ["server.clj"])
-   (reload :ids cljs-build-ids)
    (cljs-devtools)
    (dirac)
+   (reload :ids cljs-build-ids)
    (cljs
      :ids cljs-build-ids
      :optimizations :none

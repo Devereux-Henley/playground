@@ -22,7 +22,6 @@
      (fn [{:keys [backend-remote]} post-callback]
        (POST url
          {:handler (fn [response]
-                     (.log js/console response)
                      (post-callback response))
           :body (t/write (t/writer :json) backend-remote)
           :format :transit
