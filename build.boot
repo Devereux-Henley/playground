@@ -78,8 +78,8 @@
    (watch)
    (sass :output-style :expanded)
    (system :sys #'dev-system :auto true :files ["server.clj"])
-   (cljs-devtools)
-   (dirac)
+   (cljs-devtools :ids cljs-build-ids)
+   (dirac :ids cljs-build-ids :nrepl-opts {:client false :port repl-port})
    (reload :ids cljs-build-ids)
    (cljs
      :ids cljs-build-ids

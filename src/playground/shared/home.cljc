@@ -24,14 +24,14 @@
         result-state (get st route {})]
     (if (some result-state query)
       {:value (select-keys result-state query) target ast}
-      {:backend-remote ast})))
+      {:remote true})))
 
 (defmethod read-home :user/session
   [{:keys [state query target ast logger] :as env} key _]
   (let [st @state]
     (if-let [[_ value] (find st key)]
-      {:value value :backend-remote ast}
-      {:backend-remote ast})))
+      {:value value :remote ast}
+      {:remote true})))
 
 (declare app)
 
@@ -62,7 +62,6 @@
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser home-parser
-                       :remotes [:backend-remote]
                        :send server-send
                        :logger log/debug})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)]})))
@@ -75,7 +74,6 @@
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser home-parser
-                       :remotes [:backend-remote]
                        :send (util/transit-post "/api/home")
                        :logger log/debug})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)
