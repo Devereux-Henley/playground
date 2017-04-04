@@ -1,5 +1,6 @@
 (ns playground.server.home
   (:require
+   [bidi.bidi :as bidi]
    [compassus.core :as compassus]
    [hiccup.core :refer [html]]
    [hiccup.page :refer [include-js include-css]]
@@ -7,7 +8,8 @@
    [om.next :as om]
    [playground.shared.home :as home]
    [playground.shared.util :refer [create-om-string server-send]]
-   [yada.yada :as yada]))
+   [yada.yada :as yada]
+   [playground.shared.util :as util]))
 
 (defmulti read-home-data om/dispatch)
 
@@ -22,17 +24,13 @@
            :user/first-name "Devereux"
            :user/last-name "Henley"}})
 
-(defmethod read-home-data :route/index
-  [{:keys [state query] :as env} key params]
-  {:value {:index/title "Not Home"}})
-
 (defmulti mutate-home-data om/dispatch)
 
 (defmethod mutate-home-data :default
   [_ _ _]
   {:value {:error "Cannot mutate this data."}})
 
-(def home-parser
+(defonce home-parser
   (om/parser {:read read-home-data
               :mutate mutate-home-data}))
 
@@ -51,11 +49,11 @@
        [:section#app (dom/render-to-str mounted-app)]
        (include-js "/home.js")])))
 
-(defn new-home-index-resource
-  [db-spec]
+(defn new-home-resource
+  [db-spec sub-route]
   (let [configured-parser (partial home-parser {:db-spec db-spec})]
     (yada/resource
-      {:id :playground.resources/index
+      {:id (util/build-id "playground.resources" sub-route)
        :description "Serves home SPA."
        :produces [{:media-type
                    #{"text/html" "application/edn;q=0.9" "application/json;q=0.8" "application/transit+json;q=0.9"}
@@ -84,8 +82,10 @@
   [db-spec {:keys [port]}]
   (let [content-routes ["/home"
                         [
-                         ["" (new-home-index-resource db-spec)]
-                         ["/" (new-home-index-resource db-spec)]
+                         ["" (new-home-resource db-spec :route/index)]
+                         ["/" (yada/redirect :playground.resources/index)]
+                         ["/information" (new-home-resource db-spec :route/information)]
+                         ["/cards" (new-home-resource db-spec :route/cards)]
                          ]]]
     [""
      [

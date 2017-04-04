@@ -1,8 +1,21 @@
 (ns playground.shared.util
-  (:require #?(:cljs [ajax.core :refer [GET POST]])
+  (:require #?(:cljs [ajax.core :refer [GET POST]]
+               :clj [clojure.string :refer [split]])
             [cognitect.transit :as t]
             [om.next :as om]
             [om.dom :as dom]))
+
+#?(:clj
+   (defn build-id
+     [first-form keyword-to-parse]
+     (keyword
+       (str first-form
+         "/"
+         (-> keyword-to-parse
+           name
+           (split #"\/")
+           last)))))
+
 #?(:clj
    (defn create-om-string
      [reconciler ui-component]

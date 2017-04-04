@@ -5,7 +5,7 @@
   #?(:cljs (:import goog.debug.Console)))
 
 #?(:cljs
-   (def logger
+   (defonce logger
      (glog/getLogger "app")))
 
 #?(:cljs

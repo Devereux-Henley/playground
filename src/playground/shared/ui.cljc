@@ -1,9 +1,15 @@
 (ns playground.shared.ui
   (:require
+   [compassus.core :as compassus]
    [om.dom :as dom]
    [om.next :as om :refer [IQuery IQueryParams defui]]))
 
-(defui SessionMenu
+(defn change-route
+  [component route event]
+  (.preventDefault event)
+  (compassus/set-route! component route))
+
+(defui ^:once SessionMenu
   static IQuery
   (query
     [this]
@@ -19,7 +25,7 @@
 
 (def session-menu-factory (om/factory SessionMenu))
 
-(defui LoginMenu
+(defui ^:once LoginMenu
   Object
   (render
     [this]
@@ -27,7 +33,7 @@
 
 (def login-menu-factory (om/factory LoginMenu))
 
-(defui NavigationWrapper
+(defui ^:once NavigationWrapper
   static IQuery
   (query
     [this]
@@ -39,9 +45,9 @@
           {:keys [owner factory props] :as computed} (om/get-computed this)]
       (dom/div #js {:className "app-container"}
         (dom/nav #js {:className "navigation-bar"}
-          (dom/a #js {:className "navigation-bar-link"} "Home")
-          (dom/a #js {:className "navigation-bar-link"} "Cards")
-          (dom/a #js {:className "navigation-bar-link"} "Information")
+          (dom/a #js {:className "navigation-bar-link" :onClick #(change-route owner :route/index %)} "Home")
+          (dom/a #js {:className "navigation-bar-link" :onClick #(change-route owner :route/cards %)} "Cards")
+          (dom/a #js {:className "navigation-bar-link" :onClick #(change-route owner :route/information %)} "Information")
           (if session (session-menu-factory session) (login-menu-factory)))
         (dom/div nil (factory props))))))
 

@@ -6,14 +6,19 @@
    [compassus.core :as compassus]
    [om.dom :as dom]
    [om.next :as om :refer [IQuery IQueryParams defui]]
+   [playground.shared.home.cards :as cards]
    [playground.shared.home.index :as index]
+   [playground.shared.home.information :as information]
    [playground.shared.logging :as log]
    [playground.shared.ui :as ui]
    [playground.shared.util :as util]))
 
-(def routes
-  ["/" {""         :route/index
-        "home"     :route/index}])
+#?(:cljs (log/log-to-console!))
+
+(defonce routes
+  ["/" {"home"         :route/index
+        "cards"        :route/cards
+        "information"  :route/information}])
 
 (defmulti read-home om/dispatch)
 
@@ -30,7 +35,7 @@
   [{:keys [state query target ast logger] :as env} key _]
   (let [st @state]
     (if-let [[_ value] (find st key)]
-      {:value value :remote ast}
+      {:value value target ast}
       {:remote true})))
 
 (declare app)
@@ -48,7 +53,9 @@
        (partial bidi/match-route routes))))
 
 (defonce route-map
-  {:route/index index/IndexPage})
+  {:route/index       index/IndexPage
+   :route/cards       cards/CardsPage
+   :route/information information/InformationPage})
 
 (defonce home-parser
   (compassus/parser {:read read-home}))
@@ -62,8 +69,7 @@
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser home-parser
-                       :send server-send
-                       :logger log/debug})
+                       :send server-send})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)]})))
 
 #?(:cljs
@@ -75,7 +81,7 @@
                       {:state (atom {})
                        :parser home-parser
                        :send (util/transit-post "/api/home")
-                       :logger log/debug})
+                       :logger log/logger})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)
                  (compassus/did-mount (fn [_] (pushy/start! history)))
                  (compassus/will-unmount (fn [_] (pushy/stop! history)))]})))
