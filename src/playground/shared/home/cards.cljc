@@ -1,6 +1,6 @@
 (ns playground.shared.home.cards
   (:require [om.dom :as dom]
-            [om.next :as om :refer [IQuery IQueryParams defui]]))
+            [om.next :as om :refer [defui]]))
 
 (defui ^:once CardsPage
   Object

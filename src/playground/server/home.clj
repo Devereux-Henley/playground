@@ -9,7 +9,8 @@
    [playground.shared.home :as home]
    [playground.shared.util :refer [create-om-string server-send]]
    [yada.yada :as yada]
-   [playground.shared.util :as util]))
+   [playground.shared.util :as util]
+   [playground.shared.ui :as ui]))
 
 (defmulti read-home-data om/dispatch)
 
@@ -35,9 +36,10 @@
               :mutate mutate-home-data}))
 
 (defn home-page
-  [send-func]
+  [send-func current-route]
   (let [app (home/make-app send-func)
-        mounted-app (compassus/mount! app nil)]
+        mounted-app (compassus/mount! app :target)]
+    (compassus/set-route! app current-route)
     (html
       [:head
        [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
@@ -62,7 +64,8 @@
        {:get {:response (fn [ctx]
                           (case (yada/content-type ctx)
                             "text/html" (home-page
-                                          (server-send configured-parser))))}}})))
+                                          (server-send configured-parser)
+                                          sub-route)))}}})))
 
 (defn home-post-resource
   [db-spec]
@@ -80,13 +83,13 @@
 
 (defn home-content-routes
   [db-spec {:keys [port]}]
-  (let [content-routes ["/home"
-                        [
-                         ["" (new-home-resource db-spec :route/index)]
-                         ["/" (yada/redirect :playground.resources/index)]
-                         ["/information" (new-home-resource db-spec :route/information)]
-                         ["/cards" (new-home-resource db-spec :route/cards)]
-                         ]]]
+  (let [content-routes ["/"
+                        [["home" (new-home-resource db-spec :route/index)]
+                         ["home/" (yada/redirect :playground.resources/index)]
+                         ["information" (new-home-resource db-spec :route/information)]
+                         ["information/" (yada/redirect :playground.resources/information)]
+                         ["cards" (new-home-resource db-spec :route/cards)]
+                         ["cards/" (yada/redirect :playground.resources/cards)]]]]
     [""
      [
       content-routes

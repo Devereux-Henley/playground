@@ -4,8 +4,7 @@
               [pushy.core :as pushy]])
    [bidi.bidi :as bidi]
    [compassus.core :as compassus]
-   [om.dom :as dom]
-   [om.next :as om :refer [IQuery IQueryParams defui]]
+   [om.next :as om]
    [playground.shared.home.cards :as cards]
    [playground.shared.home.index :as index]
    [playground.shared.home.information :as information]
@@ -14,11 +13,6 @@
    [playground.shared.util :as util]))
 
 #?(:cljs (log/log-to-console!))
-
-(defonce routes
-  ["/" {"home"         :route/index
-        "cards"        :route/cards
-        "information"  :route/information}])
 
 (defmulti read-home om/dispatch)
 
@@ -40,15 +34,20 @@
 
 (declare app)
 
+(defonce routes
+  ["/" {"home"         :route/index
+        "cards"        :route/cards
+        "information"  :route/information}])
+
 #?(:cljs
    (defn update-route!
      [{:keys [handler] :as route}]
      (let [current-route (compassus/current-route app)]
-      (when (not= handler current-route)
-        (compassus/set-route! app handler)))))
+       (when (not= handler current-route)
+         (compassus/set-route! app handler)))))
 
 #?(:cljs
-   (def history
+   (defonce history
      (pushy/pushy update-route!
        (partial bidi/match-route routes))))
 
@@ -56,6 +55,10 @@
   {:route/index       index/IndexPage
    :route/cards       cards/CardsPage
    :route/information information/InformationPage})
+
+(defn get-route
+  [route-key]
+  (bidi/path-for routes route-key))
 
 (defonce home-parser
   (compassus/parser {:read read-home}))
@@ -69,6 +72,9 @@
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser home-parser
+                       :shared {:get-route get-route}
+                       :merge om/default-merge
+                       :remotes [:remote]
                        :send server-send})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)]})))
 
@@ -81,6 +87,7 @@
                       {:state (atom {})
                        :parser home-parser
                        :send (util/transit-post "/api/home")
+                       :shared {:get-route get-route}
                        :logger log/logger})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)
                  (compassus/did-mount (fn [_] (pushy/start! history)))
