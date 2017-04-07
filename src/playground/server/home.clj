@@ -18,8 +18,16 @@
   [_ k _]
   {:value {:error (str "No handler for key" k)}})
 
+(defmethod read-home-data :route/index
+  [{:keys [target]} _ _]
+  {:value {:post/title "Foo"}})
+
+(defmethod read-home-data :route/information
+  [{:keys [target]} _ _]
+  {:value {:post/title "Bar"}})
+
 (defmethod read-home-data :user/session
-  [{:keys [state query] :as env} _ _]
+  [{:keys [state query target] :as env} _ _]
   {:value {:organization/organization-name "Server Sent Inc."
            :user/username "Devo"
            :user/first-name "Devereux"
@@ -38,8 +46,8 @@
 (defn home-page
   [send-func current-route]
   (let [app (home/make-app send-func)
-        mounted-app (compassus/mount! app :target)]
-    (compassus/set-route! app current-route)
+        mounted-app (do (compassus/set-route! app current-route)
+                        (compassus/mount! app :target))]
     (html
       [:head
        [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
@@ -78,8 +86,8 @@
        :methods
        {:post {:consumes #{"application/transit+json;q=0.9"}
                :produces #{"application/transit+json;q=0.9"}
-               :response (fn [ctx]
-                           (configured-parser (:body ctx)))}}})))
+               :response (fn [{:keys [body]}]
+                           (configured-parser body))}}})))
 
 (defn home-content-routes
   [db-spec {:keys [port]}]

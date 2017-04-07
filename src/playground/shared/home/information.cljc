@@ -3,6 +3,10 @@
               [om.next :as om :refer [defui]]))
 
 (defui ^:once InformationPage
+  static om/IQuery
+  (query
+    [this]
+    [:page/title])
   Object
   (render
     [this]

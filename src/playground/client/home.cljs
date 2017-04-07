@@ -12,6 +12,7 @@
   []
   (if-not @mounted?
     (do
+      (compassus/set-route! home/app (:handler (bidi/match-route home/routes js/window.location.pathname)))
       (compassus/mount! home/app (gdom/getElement "app"))
       (swap! mounted? not))
     (let [route->component (-> home/app :config :route->component)

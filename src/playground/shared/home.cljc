@@ -18,18 +18,30 @@
 
 (defmethod read-home :route/index
   [{:keys [state query target ast logger] :as env} _ _]
-  (let [st @state
-        route (:compassus.core/route st)
-        result-state (get st route {})]
-    (if (some result-state query)
-      {:value (select-keys result-state query) target ast}
+  (let [st @state]
+    (if (some st query)
+      {:value (select-keys st query)}
+      {:remote true})))
+
+(defmethod read-home :route/cards
+  [{:keys [state query target ast logger] :as env} _ _]
+  (let [st @state]
+    (if (some st query)
+      {:value (select-keys st query)}
+      {:remote true})))
+
+(defmethod read-home :route/information
+  [{:keys [state query target ast logger] :as env} _ _]
+  (let [st @state]
+    (if (some st query)
+      {:value (select-keys st query)}
       {:remote true})))
 
 (defmethod read-home :user/session
   [{:keys [state query target ast logger] :as env} key _]
   (let [st @state]
     (if-let [[_ value] (find st key)]
-      {:value value target ast}
+      {:value value}
       {:remote true})))
 
 (declare app)
@@ -68,13 +80,10 @@
      [server-send]
      (compassus/application
        {:routes route-map
-        :index-route :route/index
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser home-parser
                        :shared {:get-route get-route}
-                       :merge om/default-merge
-                       :remotes [:remote]
                        :send server-send})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)]})))
 
@@ -82,7 +91,6 @@
    (defonce app
      (compassus/application
        {:routes route-map
-        :index-route :route/index
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser home-parser
@@ -90,5 +98,5 @@
                        :shared {:get-route get-route}
                        :logger log/logger})
         :mixins [(compassus/wrap-render ui/NavigationWrapper)
-                 (compassus/did-mount (fn [_] (pushy/start! history)))
+                 (compassus/will-mount (fn [_] (pushy/start! history)))
                  (compassus/will-unmount (fn [_] (pushy/stop! history)))]})))

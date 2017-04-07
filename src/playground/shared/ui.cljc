@@ -28,10 +28,14 @@
 (defonce login-menu-factory (om/factory LoginMenu))
 
 (defui ^:once NavigationWrapper
+  static om/IQueryParams
+  (params
+    [this]
+    {:user/session (om/get-query SessionMenu)})
   static om/IQuery
   (query
     [this]
-    [:user/session])
+    '[{:user/session ?user/session}])
   Object
   (render
     [this]
@@ -45,6 +49,6 @@
             (dom/a #js {:className "navigation-bar-link" :href (get-route :route/cards)} "Cards")
             (dom/a #js {:className "navigation-bar-link" :href (get-route :route/information)} "Information")
             (if session (session-menu-factory session) (login-menu-factory))))
-        (dom/div nil (factory props))))))
+        (factory props)))))
 
 (defonce navigation-bar-factory (om/factory NavigationWrapper))
