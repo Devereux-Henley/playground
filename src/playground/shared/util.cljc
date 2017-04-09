@@ -25,14 +25,15 @@
 #?(:clj
    (defn server-send
      [parser-partial]
-     (fn [{:keys [remote] :as env} callback]
-       (let [response (parser-partial remote)]
-         (callback response)))))
+     (fn [remotes callback]
+       (doseq [remote remotes]
+         (let [response (parser-partial (second remote))]
+           (callback response))))))
 
 #?(:cljs
    (defn transit-post
      [url]
-     (fn [{:keys [remote]} post-callback]
+     (fn [{:keys [remote] :as env} post-callback]
        (POST url
          {:handler (fn [response]
                      (post-callback response))

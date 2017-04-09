@@ -8,6 +8,8 @@
    [adzerk/boot-cljs "1.7.228-1" :scope "test"]
    [adzerk/boot-reload "0.5.0" :scope "test"]
    [deraen/boot-sass "0.3.0" :scope "test"]
+   [mbuczko/boot-ragtime "0.2.0" :scope "test"]
+   [ragtime "0.7.1" :scope "test"]
    [reloaded.repl "0.2.3" :scope "test"]
 
    [org.clojure/tools.nrepl "0.2.12" :scope "test"]
@@ -55,6 +57,7 @@
  '[com.stuartsierra.component :as component]
  '[clojure.tools.namespace.repl]
  '[clojure.java.io :as io]
+ '[mbuczko.boot-ragtime :refer [ragtime]]
  '[playground.server.system :refer [new-system dev-system]]
  '[powerlaces.boot-cljs-devtools :refer [cljs-devtools dirac]]
  '[system.boot :refer [system run]])

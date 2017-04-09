@@ -36,7 +36,7 @@
   {:value {:error "Cannot mutate this data."}})
 
 (defonce home-parser
-  (compassus/parser {:read read-home-data
+  (om/parser {:read read-home-data
               :mutate mutate-home-data}))
 
 (defn home-page
@@ -57,7 +57,7 @@
 
 (defn new-home-resource
   [db-spec sub-route]
-  (let [configured-parser (partial home-parser {:db-spec db-spec :state (atom {})})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec})]
     (yada/resource
       {:id (util/build-id "playground.resources" sub-route)
        :description "Serves home SPA."
@@ -73,7 +73,7 @@
 
 (defn home-post-resource
   [db-spec]
-  (let [configured-parser (partial home-parser {:db-spec db-spec :state (atom {})})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec})]
     (yada/resource
       {:id :playground.resources/home-sync-post
        :description "Post route for syncing remote with home state."
