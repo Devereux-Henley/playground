@@ -18,13 +18,9 @@
   [_ k _]
   {:value {:error (str "No handler for key" k)}})
 
-(defmethod read-home-data :route/index
-  [{:keys [target]} _ _]
-  {:value {:post/title "Foo"}})
-
-(defmethod read-home-data :route/information
-  [{:keys [target]} _ _]
-  {:value {:post/title "Bar"}})
+(defmethod read-home-data :page/title
+  [_ _ _]
+  {:value "Baz"})
 
 (defmethod read-home-data :user/session
   [{:keys [state query target] :as env} _ _]
@@ -40,7 +36,7 @@
   {:value {:error "Cannot mutate this data."}})
 
 (defonce home-parser
-  (om/parser {:read read-home-data
+  (compassus/parser {:read read-home-data
               :mutate mutate-home-data}))
 
 (defn home-page
@@ -61,7 +57,7 @@
 
 (defn new-home-resource
   [db-spec sub-route]
-  (let [configured-parser (partial home-parser {:db-spec db-spec})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec :state (atom {})})]
     (yada/resource
       {:id (util/build-id "playground.resources" sub-route)
        :description "Serves home SPA."
@@ -77,7 +73,7 @@
 
 (defn home-post-resource
   [db-spec]
-  (let [configured-parser (partial home-parser {:db-spec db-spec})]
+  (let [configured-parser (partial home-parser {:db-spec db-spec :state (atom {})})]
     (yada/resource
       {:id :playground.resources/home-sync-post
        :description "Post route for syncing remote with home state."

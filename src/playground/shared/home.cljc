@@ -16,21 +16,7 @@
 
 (defmulti read-home om/dispatch)
 
-(defmethod read-home :route/index
-  [{:keys [state query target ast logger] :as env} _ _]
-  (let [st @state]
-    (if (some st query)
-      {:value (select-keys st query)}
-      {:remote true})))
-
-(defmethod read-home :route/cards
-  [{:keys [state query target ast logger] :as env} _ _]
-  (let [st @state]
-    (if (some st query)
-      {:value (select-keys st query)}
-      {:remote true})))
-
-(defmethod read-home :route/information
+(defmethod read-home :page/title
   [{:keys [state query target ast logger] :as env} _ _]
   (let [st @state]
     (if (some st query)
@@ -73,13 +59,15 @@
   (bidi/path-for routes route-key))
 
 (defonce home-parser
-  (compassus/parser {:read read-home}))
+  (compassus/parser {:read read-home
+                     :route-dispatch false}))
 
 #?(:clj
    (defn make-app
      [server-send]
      (compassus/application
-       {:routes route-map
+       {:state (atom {})
+        :routes route-map
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser home-parser
@@ -90,7 +78,8 @@
 #?(:cljs
    (defonce app
      (compassus/application
-       {:routes route-map
+       {:state (atom {})
+        :routes route-map
         :reconciler (om/reconciler
                       {:state (atom {})
                        :parser home-parser
