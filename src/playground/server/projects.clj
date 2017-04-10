@@ -4,7 +4,7 @@
    [hiccup.core :refer [html]]
    [hiccup.page :refer [include-js include-css]]
    [om.next :as om]
-   [playground.server.db.requirements :as db]
+   [playground.server.db.projects :as db]
    [playground.shared.projects :as r]
    [playground.shared.util :refer [create-om-string server-send]]
    [schema.core :as s]

@@ -3,6 +3,7 @@
             [clojure.java.io :as io]
             [playground.server.home :refer [home-content-routes home-api-routes]]
             [playground.server.projects :refer [project-content-routes project-api-routes]]
+            [playground.server.requirements :refer [requirement-api-routes]]
             [playground.shared.util :refer [server-send]]
             [yada.yada :refer [handler resource] :as yada]))
 
@@ -26,6 +27,7 @@
     (project-content-routes db-spec config)
     ["/api"
      [
+      (requirement-api-routes db-spec config)
       (project-api-routes db-spec config)
       (home-api-routes db-spec config)
       ]]

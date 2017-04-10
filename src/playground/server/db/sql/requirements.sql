@@ -1,26 +1,67 @@
 -- src/playground/server/db/sql/requirements.sql
 -- Requirements
 
--- :name insert-project :! :n
--- :doc Insert a project into the table
-insert into Projects (ID, Name, Description)
-values (:id, :name, :description)
+-- :name get-requirement-by-id :? :1
+-- :doc Get a single requirement by its id.
+select r.* from Requirements r
+where r.ID = :id
 
--- :name insert-projects :! :n
--- :doc Insert multiple projects into the table
-insert into Projects (ID, Name, Description)
-values :tuple*:projects
+-- :name get-requirements-by-project :? :*
+-- :doc Get all requirements associated with a specific project.
+select r.* from Requirements r
+where r.ProjectID = :id
 
--- :name get-project-by-id :? :1
--- :doc Get projects by id
-select ID, Name, Description from Projects
-where ID = :id
+-- :name get-top-level-requirements-by-project :? :*
+-- :doc Get all top level requirements in project.
+select r.* from Requirements r
+join RequirementsPaths rp
+on (r.ID = rp.Ancestor)
+where r.ProjectID = :id
+and not exists (select 1 from RequirementsPaths rp
+                where r.ID = rp.Descendant)
 
--- :name get-projects :? :*
--- :doc Get all projects
-select ID, Name, Description from Projects;
+-- :name get-descendants-by-id :? :*
+-- :doc Get all children of a specified requirement.
+select r.* from Requirements r
+join RequirementsPaths rp
+on (r.ID = rp.Descendant)
+where rp.Ancestor = :id
 
--- :name projects-by-ids-specify-cols :? :*
--- :doc Projects with returned columns specified
-select :i*:cols from  Projects
-where ID in (:v*:ids )
+-- :name get-descendants-by-id-and-depth :? :*
+-- :doc Get all children of a specified requirement at a specific depth.
+select r.* from Requirements r
+join RequirementsPaths rp
+on (r.ID = rp.Descendant)
+where rp.Ancestor = :id
+and rp.Depth = :depth
+
+-- :name get-ancestors-by-id :? :*
+-- :doc Get all ancestors of a specified requirement.
+select r.* from Requirements r
+join RequirementsPaths rp
+on (r.ID = rp.Ancestor)
+where rp.Descendant = :id
+
+-- :name insert-requirement :! :n
+-- :doc Insert a single requirements.
+insert into Requirements
+values (:id, :name, :description, :project)
+
+-- :name insert-requirement-child :! :n
+-- :doc Insert a child relation between two requirements.
+insert into RequirementsPaths (Ancestor, Descendant, Depth)
+       select Ancestor, :child, Depth+1 from RequirementsPaths
+       where Descendant = :parent
+       union all select :child, :child, 0
+
+-- :name delete-requirement-child :! :n
+-- :doc Delete child relationships to a requirement.
+delete from RequirementsPaths
+       where Descendant = :id
+
+-- :name delete-requirement-child-subtree :! :n
+-- :doc Delete relationship subtree from a given requirement.
+delete from RequirementsPaths
+where Descendant in
+      (select Descendant from RequirementsPaths
+       where ancestor = :id)
