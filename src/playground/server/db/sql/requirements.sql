@@ -45,7 +45,7 @@ where rp.Descendant = :id
 -- :name insert-requirement :! :n
 -- :doc Insert a single requirements.
 insert into Requirements
-values (:id, :name, :description, :project)
+values (:name, :description, :project)
 
 -- :name insert-requirement-child :! :n
 -- :doc Insert a child relation between two requirements.

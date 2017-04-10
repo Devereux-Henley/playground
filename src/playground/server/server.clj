@@ -42,4 +42,3 @@
   (using
     (map->Server {})
     [:db]))
-
