@@ -3,8 +3,12 @@
    [clojure.spec :as spec]
    [playground.server.db.requirements :as db]))
 
+;; Generic database id spec.
+
 (spec/def ::valid-id (spec/and integer?
                        #(> % 0)))
+
+;; Requirements validation specs.
 
 (spec/def ::requirement-name (spec/and
                                string?
@@ -15,11 +19,13 @@
                                       string?
                                       #(not (empty %))))
 
-(spec/def ::requirement-project #(spec/valid? ::valid-id %))
+(spec/def ::requirement-project-id #(spec/valid? ::valid-id %))
 
 (spec/def ::requirement (spec/keys :req-un [::requirement-name
                                             ::requirement-description
                                             ::requirement-project]))
+
+;; RequirementsPaths validation specs.
 
 (spec/def ::ancestor-id #(spec/valid? ::valid-id %))
 
@@ -28,6 +34,22 @@
 (spec/def ::requirements-path (spec/keys :req-un [::ancestor-id
                                                   ::descendantid]))
 
+;; Validation wrappers.
+
+(defn validate-single-record
+  [db-call spec-key record]
+  (if (spec/valid? spec-key record)
+    (db-call record)
+    (spec/explain-data spec-key record)))
+
+(defn validate-single-requirement
+  [db-call record]
+  (validate-single-record db-call ::requirement record))
+
+(defn validate-single-requirements-path
+  [db-call record]
+  (validate-single-record db-call ::requirements-path record))
+
 (defn validate-single-id
   [db-call input-id]
   (if (spec/valid? ::valid-id input-id)
@@ -35,7 +57,8 @@
     (spec/explain-data ::valid-id input-id)))
 
 ;; Records
-(defrecord Requirement [requirement-name requirement-description requirement-project])
+
+(defrecord Requirement [requirement-name requirement-description requirement-project-id])
 
 (defrecord RequirementsPath [ancestor-id descendant-id])
 
@@ -62,8 +85,25 @@
   (validate-single-id (partial db/get-requirement-by-id db-spec) requirement-id))
 
 ;; PUT requests
+
 (defn insert-requirement!
   [db-spec requirement]
-  (if (spec/valid? ::requirement requirement)
-    (db/insert-requirement db-spec requirement)
-    (spec/explain-data ::requirement requirement)))
+  (validate-single-requirement
+    (partial db/insert-requirement! db-spec)
+    requirement))
+
+(defn insert-requirement-child-relation!
+  [db-spec requirements-relation]
+  (validate-single-requirements-path
+    (partial db/insert-requirement-child! db-spec)
+    requirements-relation))
+
+;; DELETE requests
+
+(defn delete-requirement-child-relation!
+  [db-spec requirement-id]
+  (validate-single-id (partial db/delete-requirement-child! db-spec) requirement-id))
+
+(defn delete-requirement-children-relations!
+  [db-spec requirement-id]
+  (validate-single-id (partial db/delete-requirement-child-subtree! db-spec) requirement-id))

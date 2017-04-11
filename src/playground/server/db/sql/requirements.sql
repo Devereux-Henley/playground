@@ -42,24 +42,36 @@ join RequirementsPaths rp
 on (r.ID = rp.Ancestor)
 where rp.Descendant = :id
 
--- :name insert-requirement :! :n
+-- :name insert-requirement! :! :n
 -- :doc Insert a single requirements.
-insert into Requirements
+insert into Requirements (Name, Description, ProjectID)
 values (:requirement-name, :requirement-description, :requirement-project)
 
--- :name insert-requirement-child :! :n
+-- :name insert-requirement-child! :! :n
 -- :doc Insert a child relation between two requirements.
 insert into RequirementsPaths (Ancestor, Descendant, Depth)
        select Ancestor, :descendant-id, Depth+1 from RequirementsPaths
        where Descendant = :ancestor-id
        union all select :descendant-id, :descendant-id, 0
 
--- :name delete-requirement-child :! :n
+-- :name update-requirement-name! :! :n
+-- :doc Update the name of a specified requirement.
+update Requirements set Name = :requirement-name where ID = :id
+
+-- :name update-requirement-description! :! :n
+-- :doc Update the description of a specified requirement.
+update Requirements set Description = :requirement-description where ID = :id
+
+-- :name update-requirement-project-id! :! :n
+-- :doc Update the project that the specified requirement is assigned to.
+update Requirements set ProjectID = :requirement-project-id where ID = :id
+
+-- :name delete-requirement-child! :! :n
 -- :doc Delete child relationships to a requirement.
 delete from RequirementsPaths
        where Descendant = :id
 
--- :name delete-requirement-child-subtree :! :n
+-- :name delete-requirement-child-subtree! :! :n
 -- :doc Delete relationship subtree from a given requirement.
 delete from RequirementsPaths
 where Descendant in

@@ -21,13 +21,13 @@
   (yada/resource
     {:id :playground.resources/requirements-CRUD
      :description "Serves CRUD capabilities for requirements"
-     :parameters {:path {:entry Long}}
+     :parameters {:path {:req-id Long}}
      :produces [{:media-type
                  #{"text/plain" "text/html" "application/edn;q=0.9" "application/json;q=0.8" "application/transit+json;q=0.9"}
                  :charset "UTF-8"}]
      :methods
      {:get {:response (fn [ctx]
-                        (api/get-requirement-by-id db-spec (get-in ctx [:parameters :path :entry])))}}}))
+                        (api/get-requirement-by-id db-spec (get-in ctx [:parameters :path :req-id])))}}}))
 
 (defn requirement-api-routes
   [db-spec {:keys [port]}]
@@ -35,7 +35,7 @@
                     [
                      ["" (new-requirement-list-resource db-spec)]
                      ["/" (yada/redirect :playground.resources/requirements)]
-                     [["/" [#"\d+" :entry]] (new-requirement-resource db-spec)]
+                     [["/" [#"\d+" :req-id]] (new-requirement-resource db-spec)]
                      ]]]
     [""
      [
