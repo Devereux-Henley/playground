@@ -45,14 +45,14 @@ where rp.Descendant = :id
 -- :name insert-requirement :! :n
 -- :doc Insert a single requirements.
 insert into Requirements
-values (:name, :description, :project)
+values (:requirement-name, :requirement-description, :requirement-project)
 
 -- :name insert-requirement-child :! :n
 -- :doc Insert a child relation between two requirements.
 insert into RequirementsPaths (Ancestor, Descendant, Depth)
-       select Ancestor, :child, Depth+1 from RequirementsPaths
-       where Descendant = :parent
-       union all select :child, :child, 0
+       select Ancestor, :descendant-id, Depth+1 from RequirementsPaths
+       where Descendant = :ancestor-id
+       union all select :descendant-id, :descendant-id, 0
 
 -- :name delete-requirement-child :! :n
 -- :doc Delete child relationships to a requirement.
