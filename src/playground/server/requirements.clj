@@ -1,25 +1,40 @@
 (ns playground.server.requirements
   (:require
    [playground.server.api.requirements :as api]
-   [schema.core :as schema]
+   [schema.core :as schema :refer [defschema]]
    [yada.yada :as yada]))
 
-(defn new-requirement-list-resource
+(defschema Requirement
+  {:requirement-name String
+   :requirement-description String
+   :requirement-project-id Integer})
+
+(defschema RequirementsPath
+  {:ancestor-id Integer
+   :descendant-id Integer})
+
+(defn new-requirement-base-resource
   [db-spec]
   (yada/resource
-    {:id :playground.resources/requirements
+    {:id :playground.resources/requirements-base
      :description "Serves CRUD capabilities for requirements"
      :produces [{:media-type
                  #{"text/plain" "text/html" "application/edn;q=0.9" "application/json;q=0.8" "application/transit+json;q=0.9"}
                  :charset "UTF-8"}]
      :methods
      {:get {:response (fn [ctx]
-                        "Hello")}}}))
+                        "Goodbye")}
+      :put {:parameters {:body Requirement}
+            :consumes #{"application/json;q=0.8" "application/transit+json;q=0.9"}
+            :produces #{"application/transit+json;q=0.9"}
+            :response (fn [ctx]
+                        (api/insert-requirement! db-spec (get-in ctx [:parameters :body])))}}
+     }))
 
-(defn new-requirement-resource
+(defn new-requirement-target-resource
   [db-spec]
   (yada/resource
-    {:id :playground.resources/requirements-CRUD
+    {:id :playground.resources/requirements-target
      :description "Serves CRUD capabilities for requirements"
      :parameters {:path {:req-id Long}}
      :produces [{:media-type
@@ -27,15 +42,21 @@
                  :charset "UTF-8"}]
      :methods
      {:get {:response (fn [ctx]
-                        (api/get-requirement-by-id db-spec (get-in ctx [:parameters :path :req-id])))}}}))
+                        (api/get-requirement-by-id db-spec (get-in ctx [:parameters :path :req-id])))}
+      :patch {:response (fn [ctx]
+                          (api/update-requirement!
+                            db-spec
+                            (get-in ctx [:parameters :path :req-id])
+                            {}))}
+      :delete {:response (fn [ctx] "DELETE")}}}))
 
 (defn requirement-api-routes
   [db-spec {:keys [port]}]
   (let [api-routes ["/requirements"
                     [
-                     ["" (new-requirement-list-resource db-spec)]
-                     ["/" (yada/redirect :playground.resources/requirements)]
-                     [["/" [#"\d+" :req-id]] (new-requirement-resource db-spec)]
+                     ["" (new-requirement-base-resource db-spec)]
+                     ["/" (yada/redirect :playground.resources/requirements-base)]
+                     [["/" [#"\d+" :req-id]] (new-requirement-target-resource db-spec)]
                      ]]]
     [""
      [

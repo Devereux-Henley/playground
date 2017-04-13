@@ -43,7 +43,7 @@ on (r.ID = rp.Ancestor)
 where rp.Descendant = :id
 
 -- :name insert-requirement! :! :n
--- :doc Insert a single requirements.
+-- :doc Insert a single requirement.
 insert into Requirements (Name, Description, ProjectID)
 values (:requirement-name, :requirement-description, :requirement-project)
 
@@ -54,17 +54,18 @@ insert into RequirementsPaths (Ancestor, Descendant, Depth)
        where Descendant = :ancestor-id
        union all select :descendant-id, :descendant-id, 0
 
--- :name update-requirement-name! :! :n
--- :doc Update the name of a specified requirement.
-update Requirements set Name = :requirement-name where ID = :id
-
--- :name update-requirement-description! :! :n
--- :doc Update the description of a specified requirement.
-update Requirements set Description = :requirement-description where ID = :id
-
--- :name update-requirement-project-id! :! :n
--- :doc Update the project that the specified requirement is assigned to.
-update Requirements set ProjectID = :requirement-project-id where ID = :id
+-- :name update-requirement! :! :n
+-- :doc Update a single requirement.
+/* :require [clojure.string :as string]
+[hugsql.parameters :refer [identifier-param-quote]] */
+update Requirements set
+/*~
+(string/join ","
+(for [[field _] (:requirement-updates params)]
+(str (identifier-param-quote (name field) options)
+" = :v:updates." (name field))))
+~*/
+where id = :requirement-id
 
 -- :name delete-requirement-child! :! :n
 -- :doc Delete child relationships to a requirement.
