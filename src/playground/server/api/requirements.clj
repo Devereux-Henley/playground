@@ -22,7 +22,7 @@
                                       string?
                                       #(not (empty %))))
 
-(spec/def ::requirement-project-id #(spec/valid? ::valid-id %))
+(spec/def ::requirement-project #(spec/valid? ::valid-id %))
 
 (spec/def ::requirement (spec/keys :req-un [::requirement-name
                                             ::requirement-description
@@ -54,7 +54,7 @@
 (defn validate-single-record
   [db-call spec-key record]
   (if (spec/valid? spec-key record)
-    (db-call record)
+    (do (db-call record) {:success "TRUE"})
     (spec/explain-data spec-key record)))
 
 (defn validate-single-requirement
@@ -72,12 +72,12 @@
 (defn validate-single-id
   [db-call input-id]
   (if (spec/valid? ::valid-id input-id)
-    (db-call {:id input-id})
+    (do (db-call {:id input-id}) {:success "TRUE"})
     (spec/explain-data ::valid-id input-id)))
 
 ;; Records
 
-(defrecord Requirement [requirement-name requirement-description requirement-project-id])
+(defrecord Requirement [requirement-name requirement-description requirement-project])
 
 (defrecord RequirementsPath [ancestor-id descendant-id])
 
@@ -113,24 +113,36 @@
 
 ;; PUT requests
 
-(defn insert-requirement!
+(defn insert-root-requirement!
   [db-spec requirement]
-  (validate-single-requirement
-    (do (partial db/insert-requirement! db-spec) {:status "Success"})
-    requirement))
+  (jdbc/with-db-transaction [tx db-spec]
+    (validate-single-requirement
+      (comp
+        (fn [{:keys [id]}] (db/insert-new-relation! tx {:id id}))
+        (partial db/insert-requirement! tx))
+      requirement)))
 
-(defn insert-requirement-child-relation!
-  [db-spec requirements-relation]
-  (validate-single-requirements-path
-    (partial db/insert-requirement-child! db-spec)
-    requirements-relation))
+(defn insert-requirement-child!
+  [db-spec parent-id requirement]
+  (jdbc/with-db-transaction [tx db-spec]
+    (->
+      (fn [{:keys [id]}]
+        (->
+          (fn [db-result] (db/insert-new-relation!
+                        tx
+                        {:ancestor-id id
+                         :descendant-id (:id db-result)}))
+          (comp (partial db/insert-requirement! tx))
+          (validate-single-requirement requirement)))
+      (validate-single-id parent-id))))
 
 ;; DELETE requests
 
-(defn delete-requirement-child-relation!
+(defn delete-requirement!
   [db-spec requirement-id]
-  (validate-single-id (partial db/delete-requirement-child! db-spec) requirement-id))
-
-(defn delete-requirement-children-relations!
-  [db-spec requirement-id]
-  (validate-single-id (partial db/delete-requirement-child-subtree! db-spec) requirement-id))
+  (jdbc/with-db-transaction [tx db-spec]
+    (validate-single-id
+      (juxt
+        (partial db/delete-requirement-relationships! tx)
+        (partial db/delete-requirement-by-id! tx))
+      requirement-id)))

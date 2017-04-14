@@ -29,7 +29,7 @@
    [hiccup "1.0.5"]
    [kibu/pushy "0.3.7"]
    [metosin/ring-swagger "0.23.0"]
-   [mysql/mysql-connector-java "6.0.6"]
+   [org.postgresql/postgresql "42.0.0"]
    [org.danielsz/system "0.4.0"]
    [org.omcljs/om "1.0.0-alpha47"]
    [org.clojure/tools.namespace "0.3.0-alpha3"]
@@ -53,8 +53,10 @@
 (require
  '[adzerk.boot-cljs :refer [cljs]]
  '[adzerk.boot-reload :refer [reload]]
+ '[aero.core :refer [read-config]]
  '[deraen.boot-sass :refer [sass]]
  '[com.stuartsierra.component :as component]
+ '[clojure.string :refer [join]]
  '[clojure.tools.namespace.repl]
  '[clojure.java.io :as io]
  '[mbuczko.boot-ragtime :refer [ragtime]]
@@ -67,14 +69,26 @@
 
 (task-options!
  repl {:client false
-       :port repl-port})
+       :port repl-port}
+ ragtime {:database (let [{:keys [db]}
+                          (read-config (io/file "configuration/config.edn") {:profile :dev})
+                          {:keys [subprotocol subname serverTimezone user password]} db]
+                      (str
+                        (join ":"
+                          ["jdbc" subprotocol subname])
+                        "?"
+                        (join "&"
+                          (map (fn [[name value]]
+                                 (str name "=" value))
+                            [["serverTimezone" serverTimezone]
+                             ["user" user]
+                             ["password" password]]))))})
 
 (deftask deps [])
 
 (deftask dev
   "This is the main development entry point."
   []
-
   (clojure.tools.namespace.repl/set-refresh-dirs "src/playground/server" "src/playground/shared")
 
   (comp

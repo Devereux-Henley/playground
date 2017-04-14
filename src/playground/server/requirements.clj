@@ -7,7 +7,7 @@
 (defschema Requirement
   {:requirement-name String
    :requirement-description String
-   :requirement-project-id Integer})
+   :requirement-project Integer})
 
 (defschema RequirementsPath
   {:ancestor-id Integer
@@ -24,11 +24,14 @@
      :methods
      {:get {:response (fn [ctx]
                         "Goodbye")}
-      :put {:parameters {:body Requirement}
+      :put {:parameters {:query {(schema/optional-key :parent) Long}
+                         :body Requirement}
             :consumes #{"application/json;q=0.8" "application/transit+json;q=0.9"}
-            :produces #{"application/transit+json;q=0.9"}
+            :produces #{"application/json;q=0.8" "application/transit+json;q=0.9"}
             :response (fn [ctx]
-                        (api/insert-requirement! db-spec (get-in ctx [:parameters :body])))}}
+                        (if-let [parent (get-in ctx [:parameters :query :parent])]
+                          (api/insert-requirement-child! db-spec parent (get-in ctx [:parameters :body]))
+                          (api/insert-root-requirement! db-spec (get-in ctx [:parameters :body]))))}}
      }))
 
 (defn new-requirement-target-resource
@@ -46,9 +49,12 @@
       :patch {:response (fn [ctx]
                           (api/update-requirement!
                             db-spec
-                            (get-in ctx [:parameters :path :req-id])
-                            {}))}
-      :delete {:response (fn [ctx] "DELETE")}}}))
+                            (get-in ctx [:parameters :path :req-id])))}
+      :delete {:consumes #{"application/json;q=0.8" "application/transit+json;q=0.9"}
+               :response (fn [ctx]
+                           (api/delete-requirement!
+                             db-spec
+                             (get-in ctx [:parameters :path :req-id])))}}}))
 
 (defn requirement-api-routes
   [db-spec {:keys [port]}]

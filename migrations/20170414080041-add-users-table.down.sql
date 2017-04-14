@@ -1,2 +1,2 @@
 -- rolling back recipe
-drop table Teams;
+DROP TABLE users;

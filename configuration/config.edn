@@ -6,13 +6,13 @@
  #profile {:dev {:port 3000}}
 
  :db-host "localhost"
- :db-port 3306
- :db-name "requirements"
+ :db-port 5432
+ :db-name "playground"
 
  :db
- {:classname "com.mysql.cj.jdbc.Driver"
-  :subprotocol "mysql"
-  :subname  "//localhost:3306/requirements"
+ {:classname "org.postgresql.Driver"
+  :subprotocol "postgresql"
+  :subname  #join ["//" #ref [:db-host] ":" #ref [:db-port] "/" #ref [:db-name]]
   :serverTimezone "America/Chicago"
-  :user ^:ref [:secrets :user]
-  :password ^:ref [:secrets :db-password]}}
+  :user #ref [:secrets :user]
+  :password #ref [:secrets :db-password]}}
