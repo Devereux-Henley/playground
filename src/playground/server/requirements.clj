@@ -24,7 +24,7 @@
      :methods
      {:get {:response (fn [ctx]
                         "Goodbye")}
-      :put {:parameters {:query {(schema/optional-key :parent) Long}
+      :put {:parameters {:query {(schema/optional-key :parent) Integer}
                          :body Requirement}
             :consumes #{"application/json;q=0.8" "application/transit+json;q=0.9"}
             :produces #{"application/json;q=0.8" "application/transit+json;q=0.9"}
@@ -44,13 +44,16 @@
                  #{"text/plain" "text/html" "application/edn;q=0.9" "application/json;q=0.8" "application/transit+json;q=0.9"}
                  :charset "UTF-8"}]
      :methods
-     {:get {:response (fn [ctx]
+     {:get {:produces #{"application/json;q=0.8"}
+            :response (fn [ctx]
                         (api/get-requirement-by-id db-spec (get-in ctx [:parameters :path :req-id])))}
-      :patch {:response (fn [ctx]
+      :patch {:produces #{"application/json;q=0.8"}
+              :response (fn [ctx]
                           (api/update-requirement!
                             db-spec
                             (get-in ctx [:parameters :path :req-id])))}
       :delete {:consumes #{"application/json;q=0.8" "application/transit+json;q=0.9"}
+               :produces #{"application/json"}
                :response (fn [ctx]
                            (api/delete-requirement!
                              db-spec

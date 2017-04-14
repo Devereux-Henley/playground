@@ -17,7 +17,7 @@
     :methods
     {:post {:consumes "application/x-www-form-urlencoded"
             :parameters {:form
-                         {:user s/Str :password s/Str}}
+                         {:user String :password String}}
             :response
             (fn [ctx]
               (let [{:keys [user password]} (get-in ctx [:parameters :form])]
