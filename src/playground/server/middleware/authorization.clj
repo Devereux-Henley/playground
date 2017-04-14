@@ -6,8 +6,9 @@
    [clojure.java.io :as io]))
 
 (def secret
-  (:sign-secret
-   (aero/read-config (io/file "configuration/config.edn") {})))
+  (get-in
+    (aero/read-config (io/file "configuration/config.edn") {})
+    [:secrets :jwt-secret]))
 
 (defmethod yada.security/verify :basic-auth
   [ctx scheme]
