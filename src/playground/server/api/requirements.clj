@@ -2,16 +2,15 @@
   (:require
    [clojure.java.jdbc :as jdbc]
    [clojure.spec :as spec]
+   [playground.server.api.validation :as validation :refer [read-call-wrapper
+                                                            mutate-call-wrapper
+                                                            validate-single-id
+                                                            validate-single-record]]
    [playground.server.db.requirements :as db]))
-
-;; Generic database id spec.
-
-(spec/def ::valid-id (spec/and integer?
-                       #(> % 0)))
 
 ;; Requirements validation specs.
 
-(spec/def ::requirement-id #(spec/valid? ::valid-id %))
+(spec/def ::requirement-id #(spec/valid? :validation/valid-id %))
 
 (spec/def ::requirement-name (spec/and
                                string?
@@ -20,9 +19,9 @@
 
 (spec/def ::requirement-description (spec/and
                                       string?
-                                      #(not (empty %))))
+                                      #(not (empty? %))))
 
-(spec/def ::requirement-project #(spec/valid? ::valid-id %))
+(spec/def ::requirement-project #(spec/valid? :validation/valid-id %))
 
 (spec/def ::requirement (spec/keys :req-un [::requirement-name
                                             ::requirement-description
@@ -42,45 +41,13 @@
 
 ;; RequirementsPaths validation specs.
 
-(spec/def ::ancestor-id #(spec/valid? ::valid-id %))
+(spec/def ::ancestor-id #(spec/valid? :validation/valid-id %))
 
-(spec/def ::descendant-id #(spec/valid? ::valid-id %))
+(spec/def ::descendant-id #(spec/valid? :validation/valid-id %))
 
 (spec/def ::requirements-path (spec/keys :req-un [::ancestor-id
                                                   ::descendantid]))
-;; Results
-
-(defonce success
-  {:success "true"})
-
-(defn failure
-  [failure-message]
-  {:success "false"
-   :error failure-message})
-
-(defn read-call-wrapper
-  [unsafe-call]
-  (try
-    (merge
-      {:results (unsafe-call)}
-      success)
-    (catch Exception e (failure (or (ex-data e) (.getMessage e))))))
-
-(defn mutate-call-wrapper
-  [unsafe-call]
-  (try
-    (do
-      (unsafe-call)
-      success)
-    (catch Exception e (failure (or (ex-data e) (.getMessage e))))))
-
 ;; Validation wrappers.
-
-(defn validate-single-record
-  [db-call spec-key record]
-  (if (spec/valid? spec-key record)
-    (db-call record)
-    (throw (ex-info "Invalid input" (spec/explain-data spec-key record)))))
 
 (defn validate-single-requirement
   [db-call record]
@@ -93,12 +60,6 @@
 (defn validate-single-update
   [db-call update-spec]
   (validate-single-record db-call ::requirement-update-params update-spec))
-
-(defn validate-single-id
-  [db-call input-id]
-  (if (spec/valid? ::valid-id input-id)
-    (db-call {:id input-id})
-    (throw (ex-info "Invalid input" (spec/explain-data ::valid-id input-id)))))
 
 ;; Records
 
