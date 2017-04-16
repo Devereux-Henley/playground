@@ -24,7 +24,10 @@
     (merge
       {:results (unsafe-call)}
       success)
-    (catch Exception e (failure (or (ex-data e) (.getMessage e))))))
+    (catch Exception e (let [msg (failure (or (ex-data e) (.getMessage e)))]
+                         (log/debug e)
+                         (log/error msg)
+                         msg))))
 
 (defn mutate-call-wrapper
   [unsafe-call]
@@ -32,18 +35,23 @@
     (do
       (unsafe-call)
       success)
-    (catch Exception e (failure (or (ex-data e) (.getMessage e))))))
+    (catch Exception e (let [msg (failure (or (ex-data e) (.getMessage e)))]
+                         (log/debug e)
+                         (log/error msg)
+                         msg))))
 
 (defn validate-single-id
   [db-call input-id]
   (if (spec/valid? ::valid-id input-id)
     (db-call {:id input-id})
-    (throw (ex-info "Invalid input" (spec/explain-data ::valid-id input-id)))))
+    (let [specific-issue (spec/explain-data ::valid-id input-id)]
+      (log/debug specific-issue)
+      (throw (ex-info "Invalid input" specific-issue)))))
 
 (defn validate-single-record
   [db-call spec-key record]
   (if (spec/valid? spec-key record)
     (db-call record)
     (let [specific-issue (spec/explain-data spec-key record)]
-      (log/error specific-issue)
+      (log/debug specific-issue)
       (throw (ex-info "Invalid input" specific-issue)))))

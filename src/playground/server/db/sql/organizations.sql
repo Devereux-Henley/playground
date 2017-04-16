@@ -13,7 +13,7 @@ WHERE o.id = :id
 -- :name insert-organization! :! :1
 -- :doc Insert a single organization
 INSERT INTO organizations (name, description)
-VALUES (:name, :description)
+VALUES (:organization-name, :organization-description)
 
 -- :name update-organization-by-id! :! :1
 -- :doc Update a single organization by its id.
