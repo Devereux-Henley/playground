@@ -11,7 +11,7 @@
 (spec/def ::organization-name (spec/and
                                 string?
                                 #(not (empty %))
-                                #(re-matches #"^[a-zA-Z\-]*$" %)))
+                                #(re-matches #"^[a-zA-Z\-\.\s]*$" %)))
 
 (spec/def ::organization-description (spec/and
                                        string?
@@ -41,6 +41,11 @@
 (defrecord Organization [organization-name organization-description])
 
 ;; GET requests
+
+(defn get-all-organizations
+  [db-spec]
+  (read-call-wrapper
+    #(db/get-all-organizations db-spec)))
 
 (defn get-organization-by-id
   [db-spec organization-id]

@@ -2,6 +2,7 @@
   (:require [bidi.bidi :refer [tag]]
             [clojure.java.io :as io]
             [playground.server.home :refer [home-content-routes home-api-routes]]
+            [playground.server.organizations :refer [organization-api-routes]]
             [playground.server.projects :refer [project-content-routes project-api-routes]]
             [playground.server.requirements :refer [requirement-api-routes]]
             [playground.shared.util :refer [server-send]]
@@ -27,6 +28,7 @@
     (project-content-routes db-spec config)
     ["/api"
      [
+      (organization-api-routes db-spec config)
       (requirement-api-routes db-spec config)
       (project-api-routes db-spec config)
       (home-api-routes db-spec config)

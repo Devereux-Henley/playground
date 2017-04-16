@@ -1,6 +1,7 @@
 (ns playground.server.api.validation
   (:require
-   [clojure.spec :as spec]))
+   [clojure.spec :as spec]
+   [playground.shared.logging :as log]))
 
 ;; Generic specs for validation.
 
@@ -43,4 +44,6 @@
   [db-call spec-key record]
   (if (spec/valid? spec-key record)
     (db-call record)
-    (throw (ex-info "Invalid input" (spec/explain-data spec-key record)))))
+    (let [specific-issue (spec/explain-data spec-key record)]
+      (log/error specific-issue)
+      (throw (ex-info "Invalid input" specific-issue)))))
