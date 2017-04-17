@@ -13,7 +13,7 @@
 (spec/def ::name (spec/and
                    string?
                    #(not (empty %))
-                   #(re-matches #"^[a-zA-Z\-\.\s]*$" %)))
+                   #(re-matches #"^[a-zA-Z0-9\-\.\s]*$" %)))
 
 (spec/def ::description (spec/and
                           string?

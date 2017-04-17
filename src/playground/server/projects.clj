@@ -49,7 +49,7 @@
 
 (defmethod read-projects :projects/all-projects
   [{:keys [db-spec]} _ _]
-  {:value (sanitize-project-response (db/get-projects db-spec))})
+  {:value (sanitize-project-response (db/get-all-projects db-spec))})
 
 (def project-parser
   (om/parser {:read read-projects}))

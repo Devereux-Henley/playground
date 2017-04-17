@@ -68,7 +68,7 @@ UPDATE requirements SET
 (string/join ","
 (for [[field _] (:requirement-updates params)]
 (str (identifier-param-quote (name field) options)
-" = :v:updates." (name field))))
+" = :v:requirement-updates." (name field))))
 ~*/
 WHERE id = :requirement-id
 
