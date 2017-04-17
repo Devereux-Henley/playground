@@ -25,7 +25,7 @@
       {:results (unsafe-call)}
       success)
     (catch Exception e (let [msg (failure (or (ex-data e) (.getMessage e)))]
-                         (log/debug e)
+                         (log/error e)
                          (log/error msg)
                          msg))))
 
@@ -36,7 +36,7 @@
       (unsafe-call)
       success)
     (catch Exception e (let [msg (failure (or (ex-data e) (.getMessage e)))]
-                         (log/debug e)
+                         (log/error e)
                          (log/error msg)
                          msg))))
 

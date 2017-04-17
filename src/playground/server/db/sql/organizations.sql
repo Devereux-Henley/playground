@@ -13,7 +13,7 @@ WHERE o.id = :id
 -- :name insert-organization! :! :1
 -- :doc Insert a single organization
 INSERT INTO organizations (name, description)
-VALUES (:organization-name, :organization-description)
+VALUES (:name, :description)
 
 -- :name update-organization-by-id! :! :1
 -- :doc Update a single organization by its id.
@@ -22,11 +22,11 @@ VALUES (:organization-name, :organization-description)
 UPDATE organizations o SET
 /*~
 (string/join ","
-(for [[field _] (:requirement-updates params)]
+(for [[field _] (:organization-updates params)]
 (str (identifier-param-quote (name field) options)
-" = :v:updates." (name field))))
+" = :v:organization-updates." (name field))))
 ~*/
-WHERE id = :organization-id
+WHERE id = :id
 
 -- :name delete-organization-by-id! :! :1
 -- :doc Delete a single organization by its id.

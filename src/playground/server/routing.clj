@@ -20,6 +20,8 @@
        (yada/as-resource (io/file "static"))
        (assoc :id :playground.resources/static))]]])
 
+;; Routes of the entire application
+
 (defn routes
   [db-spec config]
   [""
