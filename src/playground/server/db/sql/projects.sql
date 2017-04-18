@@ -10,8 +10,8 @@ SELECT p.* FROM projects p
 SELECT p.* FROM projects p
 WHERE p.id = :id
 
--- :name insert-organization! :! :1
--- :doc Insert a single organization
+-- :name insert-project! :! :1
+-- :doc Insert a single project
 INSERT INTO projects (name, description)
 VALUES (:name, :description)
 

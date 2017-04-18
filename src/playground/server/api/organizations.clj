@@ -15,9 +15,7 @@
                    #(not (empty %))
                    #(re-matches #"^[a-zA-Z0-9\-\.\s]*$" %)))
 
-(spec/def ::description (spec/and
-                          string?
-                          #(not (empty? %))))
+(spec/def ::description #(spec/valid? ::validation/standard-description %))
 
 (spec/def ::organization (spec/keys :req-un [::name
                                              ::description]))

@@ -15,11 +15,9 @@
 (spec/def ::requirement-name (spec/and
                                string?
                                #(not (empty %))
-                               #(re-matches #"^[a-zA-Z0-9]*$" %)))
+                               #(re-matches #"^[a-zA-Z0-9\-\.\s]*$" %)))
 
-(spec/def ::requirement-description (spec/and
-                                      string?
-                                      #(not (empty? %))))
+(spec/def ::requirement-description #(spec/valid? ::validation/standard-description %))
 
 (spec/def ::requirement-project #(spec/valid? :validation/valid-id %))
 
