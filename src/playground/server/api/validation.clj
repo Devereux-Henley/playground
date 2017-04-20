@@ -59,3 +59,7 @@
     (let [specific-issue (spec/explain-data spec-key record)]
       (log/debug specific-issue)
       (throw (ex-info "Invalid input" specific-issue)))))
+
+(defn assoc-table
+  [table input-map]
+  (assoc input-map :table table))

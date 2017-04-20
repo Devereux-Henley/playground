@@ -5,7 +5,8 @@
    [playground.server.api.validation :as validation :refer [read-call-wrapper
                                                             mutate-call-wrapper
                                                             validate-single-id
-                                                            validate-single-record]]
+                                                            validate-single-record
+                                                            assoc-table]]
    [playground.server.db.standard :as db]))
 
 (defonce table "users")
@@ -44,16 +45,16 @@
                                           ::user-name
                                           ::password]))
 
-(defn assoc-table
-  [input-map]
-  (assoc input-map :table table))
-
-(defn dissoc-password
+(defn- dissoc-password
   [output]
   (cond
     (nil? output) nil
     (seq? output) (map #(dissoc % :password) output)
     :else (dissoc output :password)))
+
+(defn- assoc-user-table
+  [input-map]
+  (assoc-table table input-map))
 
 (defn validate-single-user
   [db-call user]
@@ -78,9 +79,9 @@
   (read-call-wrapper
     #(dissoc-password
        (validate-single-id
-                        (comp (partial db/get-by-id db-spec)
-                          assoc-table)
-                        user-id))))
+         (comp (partial db/get-by-id db-spec)
+           assoc-user-table)
+         user-id))))
 
 ;; PUT requests
 
@@ -89,7 +90,7 @@
   (mutate-call-wrapper
     #(validate-single-user
        (comp (partial db/insert! db-spec)
-         assoc-table)
+         assoc-user-table)
        user)))
 
 ;; UPDATE requests
@@ -99,7 +100,7 @@
   (mutate-call-wrapper
     #(validate-single-user-update
        (comp (partial db/update-by-id! db-spec)
-         assoc-table)
+         assoc-user-table)
        user-id user)))
 
 ;; DELETE requests
@@ -109,5 +110,5 @@
   (mutate-call-wrapper
     #(validate-single-id
        (comp (partial db/delete-by-id! db-spec)
-         assoc-table)
+         assoc-user-table)
        user-id)))
