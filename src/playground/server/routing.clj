@@ -5,6 +5,7 @@
             [playground.server.organizations :refer [organization-api-routes]]
             [playground.server.projects :refer [project-content-routes project-api-routes]]
             [playground.server.requirements :refer [requirement-api-routes]]
+            [playground.server.users :refer [user-api-routes]]
             [playground.shared.util :refer [server-send]]
             [yada.yada :refer [handler resource] :as yada]))
 
@@ -30,6 +31,7 @@
     (project-content-routes db-spec config)
     ["/api"
      [
+      (user-api-routes db-spec config)
       (organization-api-routes db-spec config)
       (requirement-api-routes db-spec config)
       (project-api-routes db-spec config)

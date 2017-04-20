@@ -12,12 +12,14 @@ WHERE t.id = :id
 
 -- :name insert! :! :1
 -- :doc Insert a single record
+/* :require [clojure.string :as string]
+[hugsql.parameters :refer [identifier-param-quote]] */
 INSERT INTO :i:table
 /*~
 (str "("
   (string/join ","
     (for [[field _] (:inserts params)]
-      (str (identifier-param-quote (name field) options))))
+    (str (identifier-param-quote (string/replace (name field) #"-" "_") options))))
   ")")
 ~*/
 VALUES
@@ -33,7 +35,7 @@ UPDATE :i:table SET
 /*~
 (string/join ","
 (for [[field _] (:updates params)]
-(str (identifier-param-quote (name field) options)
+(str (identifier-param-quote (string/replace (name field) #"-" "_") options)
 " = :v:updates." (name field))))
 ~*/
 WHERE id = :id
