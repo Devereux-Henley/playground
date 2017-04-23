@@ -1,5 +1,6 @@
 (ns playground.server.api.users
   (:require
+   [buddy.hashers :refer [derive check]]
    [clojure.java.jdbc :as jdbc]
    [clojure.spec :as spec]
    [playground.server.api.validation :as validation :refer [read-call-wrapper
@@ -9,11 +10,12 @@
                                                             assoc-table
                                                             assoc-inserts
                                                             assoc-updates]]
-   [playground.server.db.standard :as db]))
+   [playground.server.db.standard :as standard-db]
+   [playground.server.db.users :as user-db]))
 
 (defonce table "users")
 
-(spec/def ::id #(spec/valid? ::validation/valid-id))
+(spec/def ::id #(spec/valid? ::validation/valid-id %))
 
 (spec/def ::user-name (spec/and
                         string?
@@ -23,17 +25,17 @@
 (spec/def ::first-name (spec/and
                          string?
                          #(not (empty? %))
-                         #(re-matches #"^[a-zA-Z\-]" %)))
+                         #(re-matches #"^[a-zA-Z]*$" %)))
 
 (spec/def ::last-name (spec/and
                         string?
                         #(not (empty? %))
-                        #(re-matches #"^[a-zA-Z\-]" %)))
+                        #(re-matches #"^[a-zA-Z]*$" %)))
 
 (spec/def ::password (spec/and
                        string?
                        #(< 8 (count %))
-                       #(re-matches #"^(?!.*([A-Za-z0-9])\1{2})(?=.*[a-z])(?=.*\d)[A-Za-z0-9]{8,16}$")))
+                       #(re-matches #"^(?!.*([A-Za-z0-9])\1{2})(?=.*[a-z])(?=.*\d)[A-Za-z0-9]{8,16}$" %)))
 
 (spec/def ::user (spec/keys
                    :req-un [::first-name
@@ -55,12 +57,23 @@
   [output]
   (cond
     (nil? output) nil
-    (seq? output) (map #(dissoc % :password) output)
-    :else (dissoc output :password)))
+    (seq? output) (map #(dissoc % :password_hash) output)
+    :else (dissoc output :password_hash)))
+
+(defn- hash-password-in-map
+  [{:keys [password] :as input-map}]
+  (let [corrected-map (dissoc input-map :password)]
+    (if password
+      (assoc corrected-map :password-hash (derive password))
+      input-map)))
 
 (defn- assoc-user-table
   [input-map]
   (assoc-table table input-map))
+
+(defn validate-single-user-name
+  [db-call user-name]
+  (validate-single-record db-call ::user-name user-name))
 
 (defn validate-single-user
   [db-call user]
@@ -78,14 +91,14 @@
 (defn get-all-users
   [db-spec]
   (read-call-wrapper
-    #(dissoc-password (db/get-all db-spec {:table table}))))
+    #(dissoc-password (standard-db/get-all db-spec {:table table}))))
 
 (defn get-user-by-id
   [db-spec user-id]
   (read-call-wrapper
     #(dissoc-password
        (validate-single-id
-         (comp (partial db/get-by-id db-spec)
+         (comp (partial standard-db/get-by-id db-spec)
            assoc-user-table)
          user-id))))
 
@@ -95,9 +108,10 @@
   [db-spec user]
   (mutate-call-wrapper
     #(validate-single-user
-       (comp (partial db/insert! db-spec)
+       (comp (partial standard-db/insert! db-spec)
          assoc-user-table
-         assoc-inserts)
+         assoc-inserts
+         hash-password-in-map)
        user)))
 
 ;; UPDATE requests
@@ -106,8 +120,11 @@
   [db-spec user-id user]
   (mutate-call-wrapper
     #(validate-single-user-update
-       (comp (partial db/update-by-id! db-spec)
-         assoc-user-table)
+       (comp (partial standard-db/update-by-id! db-spec)
+         assoc-user-table
+         (fn [{:keys [updates] :as update-map}]
+           (assoc update-map :updates
+             (hash-password-in-map updates))))
        user-id user)))
 
 ;; DELETE requests
@@ -116,6 +133,16 @@
   [db-spec user-id]
   (mutate-call-wrapper
     #(validate-single-id
-       (comp (partial db/delete-by-id! db-spec)
+       (comp (partial standard-db/delete-by-id! db-spec)
          assoc-user-table)
        user-id)))
+
+;; Non-CRUD requests
+(defn auth-user
+  [db-spec {:keys [user password]}]
+  (read-call-wrapper
+    (check
+      password
+      #(validate-single-user-name
+         (partial user-db/get-hash db-spec)
+         user))))

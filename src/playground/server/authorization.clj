@@ -2,31 +2,43 @@
   (:require
    [buddy.sign.jwt :as jwt]
    [om.next :as om]
-   [playground.server.db.requirements :as db]
-   [schema.core :as s]
+   [playground.server.api.users :as api]
+   [playground.server.middleware.authorization :refer [secret]]
+   [schema.core :as schema :refer [required-key defschema]]
    [yada.swagger :as swagger]
    [yada.yada :as yada]))
+
+(defschema UserAuth
+  {:user String
+   :password String})
 
 (defn new-authorization-post-resource
   [db-spec]
   (yada/resource
    {:id :playground.resources/authorization-token-post
     :description "Post route for authorizing users and returning JSON tokens."
-    :produces  [{:media-type #{"application/json;q=0.9" "application/edn;q=0.9" "application/transit+json;q=0.9"}
+    :produces  [{:media-type #{"text/plain"}
                  :charset "UTF-8"}]
     :methods
     {:post {:consumes "application/x-www-form-urlencoded"
-            :parameters {:form
-                         {:user String :password String}}
+            :parameters {:form UserAuth}
             :response
             (fn [ctx]
-              (let [{:keys [user password]} (get-in ctx [:parameters :form])]
-                (if false
-                  (assoc (:response ctx)
-                         :cookies {:session
-                                   {:value
-                                    (jwt/sign {:user user} "secretvaluegoeshere")}})
-                  "ooops")))}}}))
+              (let [{:keys [user password] :as auth-pair} (-> ctx :parameters :form)
+                    authenticated? (api/auth-user db-spec auth-pair)]
+                (merge
+                  (:response ctx)
+                  (if-not authenticated?
+                    {:body "Login failed"
+                     :status 401}
+                    {:status 303
+                     :headers {"location" (yada/url-for ctx :playground.resources/index)}
+                     :cookies
+                     {"session"
+                      {:value
+                       (jwt/sign
+                         {:claims (pr-str {:user user :roles #{:user}})}
+                         secret)}}}))))}}}))
 
 (defn authorization-api-routes
   [db-spec {:keys [port]}]

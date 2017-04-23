@@ -13,7 +13,7 @@
 (defmethod yada.security/verify :basic-auth
   [ctx scheme]
   (some->
-    (get-in ctx [:request :headers "x-whoami"])
+    (get-in ctx [:request :headers "authorization"])
     (jwt/unsign secret)
     :claims
     edn/read-string))
