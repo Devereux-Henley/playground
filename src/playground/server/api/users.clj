@@ -43,6 +43,9 @@
                             ::user-name
                             ::password]))
 
+(spec/def ::user-auth (spec/keys
+                        :req-un [::user-name]))
+
 (spec/def ::updates (spec/keys
                       :opt-un [::first-name
                                ::last-name
@@ -73,7 +76,7 @@
 
 (defn validate-single-user-name
   [db-call user-name]
-  (validate-single-record db-call ::user-name user-name))
+  (validate-single-record db-call ::user-auth {:user-name user-name}))
 
 (defn validate-single-user
   [db-call user]
@@ -141,8 +144,10 @@
 (defn auth-user
   [db-spec {:keys [user password]}]
   (read-call-wrapper
-    (check
-      password
-      #(validate-single-user-name
-         (partial user-db/get-hash db-spec)
-         user))))
+    (fn []
+      (check
+        password
+        (:password_hash
+         (validate-single-user-name
+           (partial user-db/get-hash db-spec)
+           user))))))

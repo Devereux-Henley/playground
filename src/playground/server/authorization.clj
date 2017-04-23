@@ -20,18 +20,18 @@
     :produces  [{:media-type #{"text/plain"}
                  :charset "UTF-8"}]
     :methods
-    {:post {:consumes "application/x-www-form-urlencoded"
-            :parameters {:form UserAuth}
+    {:post {:consumes "application/json"
+            :parameters {:body UserAuth}
             :response
             (fn [ctx]
-              (let [{:keys [user password] :as auth-pair} (-> ctx :parameters :form)
-                    authenticated? (api/auth-user db-spec auth-pair)]
+              (let [{:keys [user password] :as auth-pair} (get-in ctx [:parameters :body])
+                    authenticated? (:results (api/auth-user db-spec auth-pair))]
                 (merge
                   (:response ctx)
                   (if-not authenticated?
                     {:body "Login failed"
                      :status 401}
-                    {:status 303
+                    {:status 200
                      :headers {"location" (yada/url-for ctx :playground.resources/index)}
                      :cookies
                      {"session"

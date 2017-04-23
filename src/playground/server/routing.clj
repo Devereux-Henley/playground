@@ -1,6 +1,7 @@
 (ns playground.server.routing
   (:require [bidi.bidi :refer [tag]]
             [clojure.java.io :as io]
+            [playground.server.authorization :refer [authorization-api-routes]]
             [playground.server.home :refer [home-content-routes home-api-routes]]
             [playground.server.organizations :refer [organization-api-routes]]
             [playground.server.projects :refer [project-content-routes project-api-routes]]
@@ -33,6 +34,7 @@
     (project-content-routes db-spec config)
     ["/api"
      [
+      (authorization-api-routes db-spec config)
       (user-api-routes db-spec config)
       (organization-api-routes db-spec config)
       (team-member-api-routes db-spec config)
