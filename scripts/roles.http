@@ -1,0 +1,14 @@
+GET http://localhost:3000/api/roles
+
+#
+
+PUT http://localhost:3000/api/roles
+Content-Type: application/json
+
+{
+  "token": "edit_things",
+  "description": "Allows editing of things and stuff.",
+  "default-value": false
+}
+
+#

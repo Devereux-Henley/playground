@@ -16,15 +16,17 @@ WHERE t.id = :id
 [hugsql.parameters :refer [identifier-param-quote]] */
 INSERT INTO :i:table
 /*~
-(str "("
-  (string/join ","
-    (for [[field _] (:inserts params)]
-    (str (identifier-param-quote (string/replace (name field) #"-" "_") options))))
-  ")")
-~*/
-VALUES
-/*~
-(str "(" (vals (:inserts params)) ")")
+(str " ("
+(string/join ","
+(for [[field _] (:inserts params)]
+(str (identifier-param-quote (string/replace (name field) #"-" "_") options))))
+") "
+"VALUES "
+"("
+(string/join ","
+(for [[field _] (:inserts params)]
+(str ":v:inserts." (name field))))
+")")
 ~*/
 
 -- :name update-by-id! :! :1

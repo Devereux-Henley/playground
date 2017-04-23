@@ -63,3 +63,11 @@
 (defn assoc-table
   [table input-map]
   (assoc input-map :table table))
+
+(defn assoc-inserts
+  [input-map]
+  {:inserts input-map})
+
+(defn assoc-updates
+  [input-map]
+  {:updates input-map})

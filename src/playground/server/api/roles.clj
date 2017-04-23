@@ -6,7 +6,9 @@
                                                             mutate-call-wrapper
                                                             validate-single-id
                                                             validate-single-record
-                                                            assoc-table]]
+                                                            assoc-table
+                                                            assoc-inserts
+                                                            assoc-updates]]
    [playground.server.db.standard :as db]))
 
 (defonce table "roles")
@@ -16,7 +18,7 @@
 (spec/def ::token (spec/and
                     string?
                     #(not (empty? %))
-                    #(re-matches #"^[a-zA-Z_]*$")))
+                    #(re-matches #"^[a-zA-Z_]*$" %)))
 
 (spec/def ::description #(spec/valid? ::validation/standard-description %))
 
@@ -69,7 +71,8 @@
   (mutate-call-wrapper
     #(validate-single-role
        (comp (partial db/insert! db-spec)
-         assoc-role-table)
+         assoc-role-table
+         assoc-inserts)
        role)))
 
 (defn update-role-by-id!
@@ -77,7 +80,8 @@
   (mutate-call-wrapper
     #(validate-single-role-update
        (comp (partial db/update-by-id! db-spec)
-         assoc-role-table)
+         assoc-role-table
+         assoc-updates)
        role-id role)))
 
 (defn delete-role-by-id!

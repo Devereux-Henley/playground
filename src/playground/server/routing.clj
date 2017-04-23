@@ -5,6 +5,7 @@
             [playground.server.organizations :refer [organization-api-routes]]
             [playground.server.projects :refer [project-content-routes project-api-routes]]
             [playground.server.requirements :refer [requirement-api-routes]]
+            [playground.server.roles :refer [role-api-routes]]
             [playground.server.team-members :refer [team-member-api-routes]]
             [playground.server.users :refer [user-api-routes]]
             [playground.shared.util :refer [server-send]]
@@ -36,6 +37,7 @@
       (organization-api-routes db-spec config)
       (team-member-api-routes db-spec config)
       (requirement-api-routes db-spec config)
+      (role-api-routes db-spec config)
       (project-api-routes db-spec config)
       (home-api-routes db-spec config)
       ]]
