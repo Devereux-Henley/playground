@@ -65,6 +65,8 @@
   '[mbuczko.boot-ragtime :refer [ragtime]]
   '[playground.server.system :refer [new-system dev-system]]
   '[powerlaces.boot-cljs-devtools :refer [cljs-devtools dirac]]
+  '[ragtime.jdbc]
+  '[ragtime.repl]
   '[system.boot :refer [system run]])
 
 ;; Logging configuration
@@ -93,11 +95,8 @@
 
 (def repl-port 5600)
 (def cljs-build-ids #{"home" "administration" "requirements"})
-
-(task-options!
-  repl {:client false
-        :port repl-port}
-  ragtime {:database (let [{:keys [db]}
+(def migration-directory "migrations")
+(def database-string (let [{:keys [db]}
                            (read-config (io/file "configuration/config.edn") {:profile :dev})
                            {:keys [subprotocol subname serverTimezone user password]} db]
                        (str
@@ -109,9 +108,27 @@
                                   (str name "=" value))
                              [["serverTimezone" serverTimezone]
                               ["user" user]
-                              ["password" password]]))))})
+                              ["password" password]])))))
+
+(task-options!
+  repl {:client false
+        :port repl-port}
+  ragtime {:database database-string})
 
 (deftask deps [])
+
+(deftask remigrate
+  "Resets state of development database"
+  []
+  (let [migrations (ragtime.jdbc/load-directory migration-directory)
+        config {:datastore (ragtime.jdbc/sql-database database-string)
+                :migrations migrations}]
+    (do
+      (ragtime.repl/rollback
+        config
+        (count migrations))
+      (ragtime.repl/migrate
+        config))))
 
 (deftask dev
   "This is the main development entry point."
