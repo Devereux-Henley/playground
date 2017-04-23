@@ -29,14 +29,14 @@
                             ::description
                             ::default-value]))
 
-(spec/def ::role-updates (spec/keys
+(spec/def ::updates (spec/keys
                                  :opt-un [::token
                                           ::description
                                           ::default-value]))
 
-(spec/def ::role-update-params (spec/keys
+(spec/def ::update-params (spec/keys
                                  :req-un [::id
-                                          ::role-updates]))
+                                          ::updates]))
 
 (defn- assoc-role-table
   [input-map]
@@ -48,8 +48,8 @@
 
 (defn validate-single-role-update
   [db-call role-id role]
-  (validate-single-record db-call ::role-update-params {:id role-id
-                                                        :role-updates role}))
+  (validate-single-record db-call ::update-params {:id role-id
+                                                        :updates role}))
 
 (defrecord Role [token description default-value])
 
@@ -80,8 +80,8 @@
   (mutate-call-wrapper
     #(validate-single-role-update
        (comp (partial db/update-by-id! db-spec)
-         assoc-role-table
-         assoc-updates)
+         (fn [x] (do (println x) x))
+         assoc-role-table)
        role-id role)))
 
 (defn delete-role-by-id!

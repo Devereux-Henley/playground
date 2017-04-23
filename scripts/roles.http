@@ -12,3 +12,22 @@ Content-Type: application/json
 }
 
 #
+
+GET http://localhost:3000/api/roles/1
+
+#
+
+PUT http://localhost:3000/api/roles/1
+Content-Type: application/json
+
+{
+  "token": "edit_stuff",
+  "description": "Allows editing of only stuff.",
+  "default-value": false
+}
+
+#
+
+DELETE http://localhost:3000/api/roles/1
+
+#

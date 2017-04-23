@@ -6,7 +6,9 @@
                                                             mutate-call-wrapper
                                                             validate-single-id
                                                             validate-single-record
-                                                            assoc-table]]
+                                                            assoc-table
+                                                            assoc-inserts
+                                                            assoc-updates]]
    [playground.server.db.standard :as db]))
 
 (defonce table "users")
@@ -39,11 +41,15 @@
                             ::user-name
                             ::password]))
 
-(spec/def ::user-update-params (spec/keys
-                                 :opt-un [::first-name
-                                          ::last-name
-                                          ::user-name
-                                          ::password]))
+(spec/def ::updates (spec/keys
+                      :opt-un [::first-name
+                               ::last-name
+                               ::user-name
+                               ::password]))
+
+(spec/def ::update-params (spec/keys
+                            :req-un [::id
+                                     ::updates]))
 
 (defn- dissoc-password
   [output]
@@ -62,8 +68,8 @@
 
 (defn validate-single-user-update
   [db-call user-id user]
-  (validate-single-record db-call ::user-update-params {:id user-id
-                                                        :updates user}))
+  (validate-single-record db-call ::update-params {:id user-id
+                                                   :updates user}))
 
 (defrecord User [first-name last-name user-name password])
 
@@ -90,7 +96,8 @@
   (mutate-call-wrapper
     #(validate-single-user
        (comp (partial db/insert! db-spec)
-         assoc-user-table)
+         assoc-user-table
+         assoc-inserts)
        user)))
 
 ;; UPDATE requests

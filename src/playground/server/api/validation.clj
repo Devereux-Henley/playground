@@ -70,4 +70,6 @@
 
 (defn assoc-updates
   [input-map]
-  {:updates input-map})
+  (let [id (:id input-map)]
+    {:id id
+     :updates (dissoc input-map :id)}))

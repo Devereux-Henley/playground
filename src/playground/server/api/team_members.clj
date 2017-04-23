@@ -6,7 +6,9 @@
                                                             mutate-call-wrapper
                                                             validate-single-id
                                                             validate-single-record
-                                                            assoc-table]]
+                                                            assoc-table
+                                                            assoc-inserts
+                                                            assoc-updates]]
    [playground.server.db.standard :as standard-db]
    [playground.server.db.team-members :as db]))
 
@@ -40,7 +42,8 @@
   (mutate-call-wrapper
     #(validate-single-team-member
        (comp (partial standard-db/insert! db-spec)
-         assoc-team-member-table)
+         assoc-team-member-table
+         assoc-inserts)
        team-member)))
 
 (defn delete-team-member!
