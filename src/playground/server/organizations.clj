@@ -66,7 +66,5 @@
                      ["/" (yada/redirect :playground.resources/organizations-base)]
                      [["/" [#"\d+" :org-id]] (new-organization-target-resource db-spec)]
                      ]]]
-    [""
-     [
-      api-routes
-      ]]))
+    api-routes
+    ))

@@ -1,0 +1,27 @@
+GET http://localhost:3000/api/organizations
+
+#
+
+PUT http://localhost:3000/api/organizations
+Content-Type: application/json
+
+{
+  "name": "Playground Inc.",
+  "description": "An organization for creating and managing requirements."
+}
+
+#
+
+GET http://localhost:3000/api/organizations/1
+
+#
+
+PUT http://localhost:3000/api/organizations/1
+Content-Type: application/json
+
+{
+  "name": "Playground Corporation",
+  "description": "An updated organization for requirements stuff."
+}
+
+#

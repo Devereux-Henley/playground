@@ -10,7 +10,9 @@
     (aero/read-config (io/file "configuration/config.edn") {})
     [:secrets :jwt-secret]))
 
-(defmethod yada.security/verify :basic-auth
+(defmulti verify)
+
+(defmethod verify :basic-auth
   [ctx scheme]
   (some->
     (get-in ctx [:request :headers "authorization"])

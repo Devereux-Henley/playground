@@ -33,9 +33,10 @@
     [org.danielsz/system "0.4.0"]
     [org.omcljs/om "1.0.0-alpha47"]
     [org.clojure/tools.namespace "0.3.0-alpha3"]
+    [metosin/ring-swagger "0.23.0"]
     [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
-    [prismatic/schema "1.1.3"]
-    [yada "1.2.1"]
+    [prismatic/schema "1.1.4"]
+    [yada "1.2.1" :exclusions [aleph ring-swagger prismatic/schema]]
 
     ;; App deps
     [cljs-ajax "0.5.8"]

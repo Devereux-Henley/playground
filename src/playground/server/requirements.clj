@@ -64,7 +64,5 @@
                      ["/" (yada/redirect :playground.resources/requirements-base)]
                      [["/" [#"\d+" :req-id]] (new-requirement-target-resource db-spec)]
                      ]]]
-    [""
-     [
-      api-routes
-      ]]))
+    api-routes
+    ))

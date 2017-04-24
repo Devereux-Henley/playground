@@ -80,7 +80,6 @@
   (mutate-call-wrapper
     #(validate-single-role-update
        (comp (partial db/update-by-id! db-spec)
-         (fn [x] (do (println x) x))
          assoc-role-table)
        role-id role)))
 

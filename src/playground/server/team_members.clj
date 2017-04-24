@@ -39,7 +39,5 @@
                      ["" (new-team-member-base-resource db-spec)]
                      ["/" (yada/redirect :playground.resources/team-members-base)]
                      ]]]
-    [""
-     [
-      api-routes
-      ]]))
+    api-routes
+    ))

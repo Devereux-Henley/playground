@@ -64,7 +64,5 @@
                      ["/" (yada/redirect :playground.resources/users-base)]
                      [["/" [#"\d+" :user-id]] (new-user-target-resource db-spec)]
                      ]]]
-    [""
-     [
-      api-routes
-      ]]))
+    api-routes
+    ))

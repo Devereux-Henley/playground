@@ -46,8 +46,5 @@
                     [
                      ["" (new-authorization-post-resource db-spec)]
                      ["/" (new-authorization-post-resource db-spec)]]]]
-    [""
-     [
-      api-routes
-      ]]
+    api-routes
     ))

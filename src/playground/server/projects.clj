@@ -147,24 +147,8 @@
                         [
                          ["" (new-index-resource db-spec)]
                          ["/" (new-index-resource db-spec)]]]]
-    [""
-     [
-      content-routes
-      ["/projects-api/swagger.json"
-       (bidi/tag
-        (yada/handler
-         (swagger/swagger-spec-resource
-          (swagger/swagger-spec
-           content-routes
-           {:info {:title "Projects"
-                   :version "1.0"
-                   :description "A simple application for displaying requirements"}
-            :host (format "localhost:%d" port)
-            :schemes ["http"]
-            :tags [{:name "getters"
-                    :description "All paths that support GET"}]
-            :basePath ""})))
-        :playground.resources/projects-swagger)]]]))
+    content-routes
+    ))
 
 (defn project-api-routes
   [db-spec {:keys [port]}]
@@ -174,10 +158,8 @@
                      ["/" (yada/redirect :playground.resources/projects-base)]
                      [["/" [#"\d+" :project-id]] (new-project-target-resource db-spec)]
                      ]]]
-    [""
-     [
-      api-routes
-      ]]))
+    api-routes
+    ))
 
 (defn project-sync-routes
   [db-spec {:keys [port]}]

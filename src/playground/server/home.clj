@@ -106,7 +106,5 @@
                      ["" (home-post-resource db-spec)]
                      ["/" (home-post-resource db-spec)]
                      ]]]
-    [""
-     [
-      api-routes
-      ]]))
+    api-routes
+    ))
