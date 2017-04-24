@@ -18,16 +18,19 @@
                  :charset "UTF-8"}]
      :methods
      {:get {:produces standard-outputs
+            :swagger/tags ["team-members" "list"]
             :response (fn [ctx] (api/get-all-team-members db-spec))}
       :put {:parameters {:body TeamMember}
             :consumes standard-inputs
             :produces standard-outputs
+            :swagger/tags ["team-members" "create"]
             :response (fn [ctx]
                         (api/insert-team-member! db-spec (map->TeamMember
                                                            (get-in ctx [:parameters :body]))))}
       :delete {:parameters {:body TeamMember}
                :consumes standard-inputs
                :produces standard-outputs
+               :swagger/tags ["team-members" "delete"]
                :response (fn [ctx]
                            (api/delete-team-member! db-spec (map->TeamMember
                                                               (get-in ctx [:parameters :body]))))}}}))

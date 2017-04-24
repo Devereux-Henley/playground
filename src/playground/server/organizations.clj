@@ -21,10 +21,12 @@
      :produces [{:media-type standard-outputs}]
      :methods
      {:get {:produces standard-outputs
+            :swagger/tags ["organizations" "list"]
             :response (fn [ctx] (api/get-all-organizations db-spec))}
       :put {:parameters {:body Organization}
             :consumes standard-inputs
             :produces standard-outputs
+            :swagger/tags ["organizations" "create"]
             :response (fn [ctx]
                         (api/insert-organization! db-spec (map->Organization
                                                             (get-in ctx [:parameters :body]))))}}}))
@@ -38,12 +40,14 @@
      :produces [{:media-type standard-outputs}]
      :methods
      {:get {:produces standard-outputs
+            :swagger/tags ["organizations" "read"]
             :response (fn [ctx]
                         (api/get-organization-by-id db-spec
                           (get-in ctx [:parameters :path :org-id])))}
       :put   {:parameters {:body Organization}
               :consumes standard-inputs
               :produces standard-outputs
+              :swagger/tags ["organizations" "update"]
               :response (fn [ctx]
                           (api/update-organization-by-id!
                             db-spec

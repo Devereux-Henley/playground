@@ -20,10 +20,12 @@
                  :charset "UTF-8"}]
      :methods
      {:get {:produces standard-outputs
+            :swagger/tags ["users" "list"]
             :response (fn [ctx] (api/get-all-users db-spec))}
       :put {:parameters {:body User}
             :consumes standard-inputs
             :produces standard-outputs
+            :swagger/tags ["users" "create"]
             :response (fn [ctx]
                         (api/insert-user! db-spec (map->User
                                                     (get-in ctx [:parameters :body]))))}}}))
@@ -38,12 +40,14 @@
                  :charset "UTF-8"}]
      :methods
      {:get {:produces standard-outputs
+            :swagger/tags ["users" "read"]
             :response (fn [ctx]
                         (api/get-user-by-id db-spec
                           (get-in ctx [:parameters :path :user-id])))}
       :put {:parameters {:body User}
             :consumes standard-inputs
             :produces standard-outputs
+            :swagger/tags ["users" "update"]
             :response (fn [ctx]
                         (api/update-user-by-id!
                           db-spec
@@ -51,6 +55,7 @@
                           (map->User (get-in ctx [:parameters :body]))))}
       :delete {:consumes standard-inputs
                :produces standard-outputs
+               :swagger/tags ["users" "delete"]
                :response (fn [ctx]
                            (api/delete-user-by-id!
                              db-spec

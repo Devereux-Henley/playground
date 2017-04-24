@@ -55,6 +55,28 @@
                    :description "API routes for playground application."}
             :host (format "localhost:%d" port)
             :schemes ["http"]
+            :tags [{:name "organizations"
+                    :description "All paths for organization resources."}
+                   {:name "users"
+                    :description "All paths for user resources."}
+                   {:name "roles"
+                    :description "All paths for auth role resources."}
+                   {:name "requirements"
+                    :description "All paths for requirement resources."}
+                   {:name "team-members"
+                    :description "All paths for team-member resources."}
+                   {:name "projects"
+                    :description "All paths for project resources."}
+                   {:name "read"
+                    :description "All READ routes."}
+                   {:name "create"
+                    :description "All CREATE routes."}
+                   {:name "update"
+                    :description "All UPDATE routes."}
+                   {:name "list"
+                    :description "All LIST routes."}
+                   {:name "delete"
+                    :description "All DELETE routes."}]
             :basePath "/swagger"})
          (tag :playground.resources/swagger-json))]
 

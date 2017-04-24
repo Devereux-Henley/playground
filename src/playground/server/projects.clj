@@ -111,10 +111,12 @@
      :produces [{:media-type standard-outputs}]
      :methods
      {:get {:produces standard-outputs
+            :swagger/tags ["projects" "list"]
             :response (fn [ctx] (api/get-all-projects db-spec))}
       :put {:parameters {:body Project}
             :consumes standard-inputs
             :produces standard-outputs
+            :swagger/tags ["projects" "create"]
             :response (fn [ctx]
                         (api/insert-project! db-spec (map->Project
                                                        (get-in ctx [:parameters :body]))))}}}))
@@ -128,6 +130,7 @@
      :produces [{:media-type standard-outputs}]
      :methods
      {:get {:produces standard-outputs
+            :swagger/tags ["projects" "read"]
             :response (fn [ctx]
                         (api/get-project-by-id
                           db-spec
@@ -135,6 +138,7 @@
       :put {:parameters {:body Project}
             :consumes standard-inputs
             :produces standard-outputs
+            :swagger/tags ["projects" "update"]
             :response (fn [ctx]
                         (api/update-project-by-id!
                           db-spec

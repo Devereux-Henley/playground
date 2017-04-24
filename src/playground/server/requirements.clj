@@ -26,6 +26,7 @@
                          :body Requirement}
             :consumes standard-inputs
             :produces standard-outputs
+            :swagger/tags ["requirements" "create"]
             :response (fn [ctx]
                         (if-let [parent (get-in ctx [:parameters :query :parent])]
                           (api/insert-requirement-child! db-spec parent (get-in ctx [:parameters :body]))
@@ -42,15 +43,18 @@
                  :charset "UTF-8"}]
      :methods
      {:get {:produces standard-outputs
+            :swagger/tags ["requirements" "read"]
             :response (fn [ctx]
                         (api/get-requirement-by-id db-spec (get-in ctx [:parameters :path :req-id])))}
       :patch {:produces standard-outputs
+              :swagger/tags ["requirements" "update"]
               :response (fn [ctx]
                           (api/update-requirement!
                             db-spec
                             (get-in ctx [:parameters :path :req-id])))}
       :delete {:consumes standard-inputs
                :produces standard-outputs
+               :swagger/tags ["requirements" "delete"]
                :response (fn [ctx]
                            (api/delete-requirement!
                              db-spec
