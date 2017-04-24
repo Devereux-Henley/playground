@@ -31,7 +31,7 @@
                   (if-not authenticated?
                     {:body "Login failed"
                      :status 401}
-                    {:status 200
+                    {:status 303
                      :headers {"location" (yada/url-for ctx :playground.resources/index)}
                      :cookies
                      {"session"
