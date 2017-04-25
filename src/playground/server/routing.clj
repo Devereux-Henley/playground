@@ -29,15 +29,15 @@
 ;; Routes of the entire application
 
 (defn routes
-  [db-spec {:keys [port] :as config}]
+  [resources db-spec {:keys [port] :as config}]
   (let [api-routes ["/api"
                     [
                      (authorization-api-routes db-spec config)
                      (user-api-routes db-spec config)
                      (organization-api-routes db-spec config)
-                     (team-member-api-routes db-spec config)
+                     (team-member-api-routes (:team-members resources) config)
                      (requirement-api-routes db-spec config)
-                     (role-api-routes db-spec config)
+                     (role-api-routes (:roles resources) config)
                      (project-api-routes db-spec config)
                      (home-api-routes db-spec config)
                      ]]]

@@ -1,5 +1,10 @@
 (ns playground.server.team-members
   (:require
+   [playground.server.api.protocols :refer [create-record
+                                            read-record
+                                            update-record
+                                            delete-record
+                                            list-record]]
    [playground.server.api.team-members :as api :refer [map->TeamMember]]
    [playground.server.constants :refer [standard-inputs standard-outputs]]
    [schema.core :as schema :refer [defschema]]
@@ -10,7 +15,7 @@
    :team-id Integer})
 
 (defn new-team-member-base-resource
-  [db-spec]
+  [team-member-resource]
   (yada/resource
     {:id :playground.resources/team-members-base
      :description "Serves CREATE, LIST, and DELETE capabilities for team-member data."
@@ -19,27 +24,27 @@
      :methods
      {:get {:produces standard-outputs
             :swagger/tags ["team-members" "list"]
-            :response (fn [ctx] (api/get-all-team-members db-spec))}
+            :response (fn [ctx] (list-record team-member-resource))}
       :put {:parameters {:body TeamMember}
             :consumes standard-inputs
             :produces standard-outputs
             :swagger/tags ["team-members" "create"]
             :response (fn [ctx]
-                        (api/insert-team-member! db-spec (map->TeamMember
-                                                           (get-in ctx [:parameters :body]))))}
+                        (create-record team-member-resource (map->TeamMember
+                                                              (get-in ctx [:parameters :body]))))}
       :delete {:parameters {:body TeamMember}
                :consumes standard-inputs
                :produces standard-outputs
                :swagger/tags ["team-members" "delete"]
                :response (fn [ctx]
-                           (api/delete-team-member! db-spec (map->TeamMember
-                                                              (get-in ctx [:parameters :body]))))}}}))
+                           (delete-record team-member-resource (map->TeamMember
+                                                                 (get-in ctx [:parameters :body]))))}}}))
 
 (defn team-member-api-routes
-  [db-spec {:keys [port]}]
+  [team-member-resource {:keys [port]}]
   (let [api-routes ["/team-members"
                     [
-                     ["" (new-team-member-base-resource db-spec)]
+                     ["" (new-team-member-base-resource team-member-resource)]
                      ["/" (yada/redirect :playground.resources/team-members-base)]
                      ]]]
     api-routes

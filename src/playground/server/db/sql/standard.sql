@@ -46,3 +46,15 @@ WHERE id = :id
 -- :doc Delete a single record by its id.
 DELETE FROM :i:table
 WHERE id = :id
+
+-- :name delete-by-pivot! :! :1
+-- :doc Delete a single record from a pivot table.
+/* :require [clojure.string :as string]
+[hugsql.parameters :refer [identifier-param-quote]] */
+DELETE FROM :i:table WHERE
+/*~
+(string/join " AND "
+(for [[field _] (:deletes params)]
+(str (identifier-param-quote (string/replace (name field) #"-" "_") options)
+" = :v:deletes." (name field))))
+~*/

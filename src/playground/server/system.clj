@@ -4,6 +4,7 @@
     [clojure.java.io :as io]
     [com.stuartsierra.component :refer [system-map system-using]]
     [playground.server.server :refer [new-server]]
+    [playground.server.resources :refer [new-resource-map]]
     [playground.server.db :as db]))
 
 (defn config
@@ -18,6 +19,7 @@
   [config]
   (system-map
     :server (new-server)
+    :resource-map (new-resource-map)
     :db (db/create-db)))
 
 (defn new-dependency-map

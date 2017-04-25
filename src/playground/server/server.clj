@@ -16,6 +16,7 @@
 (defrecord Server
   [port
    db
+   resource-map
    listener]
   Lifecycle
   (start
@@ -26,7 +27,7 @@
       (let
         [vhosts-model (vhosts-model
                         [{:scheme :http :host (format "localhost:%d" port)}
-                         (routes db {:port port})])
+                         (routes resource-map db {:port port})])
          listener (yada/listener vhosts-model {:port port})]
         (infof "Started server on port %s" (:port listener))
         (assoc component :listener listener))))
@@ -41,4 +42,5 @@
   []
   (using
     (map->Server {})
-    [:db]))
+    [:db
+     :resource-map]))
