@@ -10,6 +10,7 @@
             [playground.server.team-members :refer [team-member-api-routes]]
             [playground.server.users :refer [user-api-routes]]
             [playground.server.user-group-relations :refer [user-group-relation-api-routes]]
+            [playground.server.user-group-role-relations :refer [user-group-role-relation-api-routes]]
             [playground.shared.util :refer [server-send]]
             [yada.resources.webjar-resource :refer [new-webjar-resource]]
             [yada.swagger :as swagger]
@@ -40,6 +41,7 @@
                      (requirement-api-routes db-spec config)
                      (role-api-routes (:roles resources) config)
                      (user-group-relation-api-routes (:user-group-relations resources) config)
+                     (user-group-role-relation-api-routes (:user-group-role-relations resources) config)
                      (project-api-routes db-spec config)
                      (home-api-routes db-spec config)
                      ]]]
@@ -61,6 +63,10 @@
                     :description "All paths for organization resources."}
                    {:name "users"
                     :description "All paths for user resources."}
+                   {:name "user-group-relations"
+                    :description "All paths for user group relation resources."}
+                   {:name "user-group-role-relations"
+                    :description "All paths for user group role relation resources."}
                    {:name "roles"
                     :description "All paths for auth role resources."}
                    {:name "requirements"

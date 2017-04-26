@@ -4,6 +4,7 @@
    [playground.server.api.roles :as roles]
    [playground.server.api.team-members :as team-members]
    [playground.server.api.user-group-relations :as user-group-relations]
+   [playground.server.api.user-group-role-relations :as user-group-role-relations]
    [playground.server.api.standard :refer [map->StandardRestResource map->PivotRestResource]]))
 
 (defn new-team-member-resource
@@ -25,11 +26,18 @@
                            :table user-group-relations/table
                            :record-spec ::user-group-relations/user-group-relation}))
 
+(defn new-user-group-role-relation-resource
+  [db-spec]
+  (map->PivotRestResource {:db-spec db-spec
+                           :table user-group-role-relations/table
+                           :record-spec ::user-group-role-relations/user-group-role-relation}))
+
 (defn- get-full-resource-map
   [db-spec]
   {:roles (new-role-resource db-spec)
    :team-members (new-team-member-resource db-spec)
-   :user-group-relations (new-user-group-relation-resource db-spec)})
+   :user-group-relations (new-user-group-relation-resource db-spec)
+   :user-group-role-relations (new-user-group-role-relation-resource db-spec)})
 
 (defrecord ResourceMap [db]
   Lifecycle
