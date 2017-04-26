@@ -4,7 +4,7 @@
             [playground.server.authorization :refer [authorization-api-routes]]
             [playground.server.home :refer [home-content-routes home-api-routes]]
             [playground.server.organizations :refer [organization-api-routes]]
-            [playground.server.projects :refer [project-content-routes project-api-routes]]
+            [playground.server.projects :refer [project-api-routes]]
             [playground.server.requirements :refer [requirement-api-routes]]
             [playground.server.roles :refer [role-api-routes]]
             [playground.server.team-members :refer [team-member-api-routes]]
@@ -42,13 +42,12 @@
                      (role-api-routes (:roles resources) config)
                      (user-group-relation-api-routes (:user-group-relations resources) config)
                      (user-group-role-relation-api-routes (:user-group-role-relations resources) config)
-                     (project-api-routes db-spec config)
+                     (project-api-routes (:projects resources) config)
                      (home-api-routes db-spec config)
                      ]]]
     [""
      [
       (home-content-routes db-spec config)
-      (project-content-routes db-spec config)
       api-routes
       ["/swagger"
        (->

@@ -1,14 +1,14 @@
 -- src/playground/server/db/sql/standard.sql
 -- Standard CRUD
 
--- :name get-all :? :n
+-- :name get-all :? :*
 -- :doc Get all fields from a specified table.
 SELECT * FROM :i:table
 
 -- :name get-by-id :? :1
 -- :doc Get a single record by its id.
-SELECT * FROM :i:table t
-WHERE t.id = :id
+SELECT * FROM :i:table
+WHERE id = :id
 
 -- :name insert! :! :1
 -- :doc Insert a single record

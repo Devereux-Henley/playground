@@ -1,11 +1,19 @@
 (ns playground.server.resources
   (:require
    [com.stuartsierra.component :refer [Lifecycle using]]
+   [playground.server.api.projects :as projects]
    [playground.server.api.roles :as roles]
    [playground.server.api.team-members :as team-members]
    [playground.server.api.user-group-relations :as user-group-relations]
    [playground.server.api.user-group-role-relations :as user-group-role-relations]
    [playground.server.api.standard :refer [map->StandardRestResource map->PivotRestResource]]))
+
+(defn new-project-resource
+  [db-spec]
+  (map->StandardRestResource {:db-spec db-spec
+                              :table projects/table
+                              :record-spec ::projects/project
+                              :update-spec ::projects/update-params}))
 
 (defn new-team-member-resource
   [db-spec]
@@ -34,7 +42,8 @@
 
 (defn- get-full-resource-map
   [db-spec]
-  {:roles (new-role-resource db-spec)
+  {:projects (new-project-resource db-spec)
+   :roles (new-role-resource db-spec)
    :team-members (new-team-member-resource db-spec)
    :user-group-relations (new-user-group-relation-resource db-spec)
    :user-group-role-relations (new-user-group-role-relation-resource db-spec)})
