@@ -12,8 +12,10 @@
 
 (defmethod yada.security/verify :basic-auth
   [ctx scheme]
-  (some->
-    (get-in ctx [:cookies "session"])
-    (jwt/unsign secret)
-    :claims
-    edn/read-string))
+  (try
+    (some->
+      (get-in ctx [:cookies "session"])
+      (jwt/unsign secret)
+      :claims
+      edn/read-string)
+    (catch Exception e false)))

@@ -1,6 +1,7 @@
 (ns playground.server.authorization
   (:require
    [buddy.sign.jwt :as jwt]
+   [clj-time.core :as time]
    [om.next :as om]
    [playground.server.api.users :as api]
    [playground.server.middleware.authorization :refer [secret]]
@@ -33,12 +34,14 @@
                     {:body "Login failed"
                      :status 401}
                     {:status 303
+                     :body "Login succeeded"
                      :headers {"location" (yada/url-for ctx :playground.resources/index)}
                      :cookies
                      {"session"
                       {:value
                        (jwt/sign
-                         {:claims (pr-str {:user user :roles #{:user}})}
+                         {:claims (pr-str {:user user :roles #{:user}})
+                          :exp (time/plus (time/now) (time/hours 8))}
                          secret)}}}))))}}}))
 
 (defn authorization-api-routes
