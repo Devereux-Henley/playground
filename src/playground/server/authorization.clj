@@ -21,6 +21,7 @@
                  :charset "UTF-8"}]
     :methods
     {:post {:consumes "application/json"
+            :produces "text/plain"
             :parameters {:body UserAuth}
             :response
             (fn [ctx]

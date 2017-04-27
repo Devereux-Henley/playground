@@ -19,6 +19,9 @@
     {:id :playground.resources/organizations-base
      :description "Serves CREATE and LIST capabilities for organization data."
      :produces [{:media-type standard-outputs}]
+     :access-control
+     {:scheme :basic-auth
+      :authorization {:methods {:get :user}}}
      :methods
      {:get {:produces standard-outputs
             :swagger/tags ["organizations" "list"]
