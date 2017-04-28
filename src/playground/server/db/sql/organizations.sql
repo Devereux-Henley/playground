@@ -1,7 +1,7 @@
 -- src/playground/server/db/sql/organizations.sql
 -- organizations
 
--- :name get-all-organizations :? :n
+-- :name get-all-organizations :? :*
 -- :doc Get all organizations.
 SELECT o.* FROM organizations o
 

@@ -1,6 +1,5 @@
 (ns playground.server.api.users
   (:require
-   [buddy.hashers :refer [derive check]]
    [clojure.java.jdbc :as jdbc]
    [clojure.spec :as spec]
    [playground.server.api.validation :as validation :refer [read-call-wrapper
@@ -11,50 +10,10 @@
                                                             assoc-inserts
                                                             assoc-updates]]
    [playground.server.db.standard :as standard-db]
-   [playground.server.db.users :as user-db]))
+   [playground.server.db.users :as user-db]
+   [playground.server.specs.users :as user-specs]))
 
 (defonce table "users")
-
-(spec/def ::id #(spec/valid? ::validation/valid-id %))
-
-(spec/def ::user-name (spec/and
-                        string?
-                        #(not (empty? %))
-                        #(re-matches #"^[a-zA-Z0-9]*$" %)))
-
-(spec/def ::first-name (spec/and
-                         string?
-                         #(not (empty? %))
-                         #(re-matches #"^[a-zA-Z]*$" %)))
-
-(spec/def ::last-name (spec/and
-                        string?
-                        #(not (empty? %))
-                        #(re-matches #"^[a-zA-Z]*$" %)))
-
-(spec/def ::password (spec/and
-                       string?
-                       #(< 8 (count %))
-                       #(re-matches #"^(?!.*([A-Za-z0-9])\1{2})(?=.*[a-z])(?=.*\d)[A-Za-z0-9]{8,16}$" %)))
-
-(spec/def ::user (spec/keys
-                   :req-un [::first-name
-                            ::last-name
-                            ::user-name
-                            ::password]))
-
-(spec/def ::user-auth (spec/keys
-                        :req-un [::user-name]))
-
-(spec/def ::updates (spec/keys
-                      :opt-un [::first-name
-                               ::last-name
-                               ::user-name
-                               ::password]))
-
-(spec/def ::update-params (spec/keys
-                            :req-un [::id
-                                     ::updates]))
 
 (defn- dissoc-password
   [output]
@@ -76,15 +35,15 @@
 
 (defn validate-single-user-name
   [db-call user-name]
-  (validate-single-record db-call ::user-auth {:user-name user-name}))
+  (validate-single-record db-call ::user-specs/user-auth {:user-name user-name}))
 
 (defn validate-single-user
   [db-call user]
-  (validate-single-record db-call ::user user))
+  (validate-single-record db-call ::user-specs/user user))
 
 (defn validate-single-user-update
   [db-call user-id user]
-  (validate-single-record db-call ::update-params {:id user-id
+  (validate-single-record db-call ::user-specs/update-params {:id user-id
                                                    :updates user}))
 
 (defrecord User [first-name last-name user-name password])
@@ -129,25 +88,3 @@
            (assoc update-map :updates
              (hash-password-in-map updates))))
        user-id user)))
-
-;; DELETE requests
-
-(defn delete-user-by-id!
-  [db-spec user-id]
-  (mutate-call-wrapper
-    #(validate-single-id
-       (comp (partial standard-db/delete-by-id! db-spec)
-         assoc-user-table)
-       user-id)))
-
-;; Non-CRUD requests
-(defn auth-user
-  [db-spec {:keys [user password]}]
-  (read-call-wrapper
-    (fn []
-      (check
-        password
-        (:password_hash
-         (validate-single-user-name
-           (partial user-db/get-hash db-spec)
-           user))))))

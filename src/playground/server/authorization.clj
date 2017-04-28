@@ -3,7 +3,7 @@
    [buddy.sign.jwt :as jwt]
    [clj-time.core :as time]
    [om.next :as om]
-   [playground.server.api.users :as api]
+   [playground.server.api.authorization :as api]
    [playground.server.middleware.authorization :refer [secret]]
    [schema.core :as schema :refer [required-key defschema]]
    [yada.swagger :as swagger]
@@ -27,7 +27,8 @@
             :response
             (fn [ctx]
               (let [{:keys [user password] :as auth-pair} (get-in ctx [:parameters :body])
-                    authenticated? (:results (api/auth-user db-spec auth-pair))]
+                    {:keys [id authenticated?]} (:results (api/auth-user db-spec auth-pair))
+                    roles (if authenticated? (:results (api/get-user-roles db-spec id)) nil)]
                 (merge
                   (:response ctx)
                   (if-not authenticated?

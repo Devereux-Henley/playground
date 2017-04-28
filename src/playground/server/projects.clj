@@ -115,7 +115,6 @@
        {:get {:produces standard-outputs
               :swagger/tags ["projects" "read"]
               :response (fn [ctx]
-                          (println "Hello")
                           (read-record
                             project-resource
                             (get-in ctx [:parameters :path :project-id])))}

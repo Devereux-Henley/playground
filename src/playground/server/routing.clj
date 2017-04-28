@@ -33,10 +33,10 @@
 
 (defn routes
   [resources db-spec {:keys [port] :as config}]
-  (let [api-routes ["/api"
+  (let [api-routes [""
                     [
                      (authorization-api-routes db-spec config)
-                     (user-api-routes db-spec config)
+                     (user-api-routes (:users resources) config)
                      (organization-api-routes db-spec config)
                      (team-member-api-routes (:team-members resources) config)
                      (requirement-api-routes db-spec config)
@@ -51,7 +51,7 @@
      [
       (home-content-routes db-spec config)
       api-routes
-      ["/swagger"
+      ["/api"
        (->
          api-routes
          (yada/swaggered
@@ -88,7 +88,7 @@
                     :description "All LIST routes."}
                    {:name "delete"
                     :description "All DELETE routes."}]
-            :basePath "/swagger"})
+            :basePath "/api"})
          (tag :playground.resources/swagger-json))]
 
       ["/swagger-ui" (-> (new-webjar-resource "/swagger-ui")

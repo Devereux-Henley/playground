@@ -3,14 +3,15 @@
    [aero.core :as aero]
    [buddy.sign.jwt :as jwt]
    [clojure.edn :as edn]
-   [clojure.java.io :as io]))
+   [clojure.java.io :as io]
+   [yada.security :as security]))
 
 (def secret
   (get-in
     (aero/read-config (io/file "configuration/config.edn") {})
     [:secrets :jwt-secret]))
 
-(defmethod yada.security/verify :basic-auth
+(defmethod security/verify :basic-auth
   [ctx scheme]
   (try
     (some->

@@ -1,16 +1,8 @@
 (ns playground.server.api.validation
   (:require
    [clojure.spec :as spec]
+   [playground.server.specs.standard :as standard]
    [playground.shared.logging :as log]))
-
-;; Generic specs for validation.
-
-(spec/def ::valid-id (spec/and integer?
-                       #(> % 0)))
-
-(spec/def ::standard-description (spec/and
-                                   string?
-                                   #(not (empty? %))))
 
 ;; Wrap reads and mutates
 
@@ -46,9 +38,9 @@
 
 (defn validate-single-id
   [db-call input-id]
-  (if (spec/valid? ::valid-id input-id)
+  (if (spec/valid? ::standard/valid-id input-id)
     (db-call {:id input-id})
-    (let [specific-issue (spec/explain-data ::valid-id input-id)]
+    (let [specific-issue (spec/explain-data ::standard/valid-id input-id)]
       (log/debug specific-issue)
       (throw (ex-info "Invalid input" specific-issue)))))
 
