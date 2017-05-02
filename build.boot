@@ -161,14 +161,12 @@
   (println "Running system with profile" profile)
   (let [system (new-system profile)]
     (component/start system)
-    (intern 'user 'system system)
     (with-pre-wrap fileset
       (assoc fileset :system system))))
 
 (deftask run! [p profile VAL kw "Profile"]
   (comp
     (repl :server true
-      :port (case profile :prod 5601 :beta 5602 5600)
-      :init-ns 'user)
+      :port (case profile :prod 5601 :beta 5602 5600))
     (run-system (or profile :prod))
     (wait)))
