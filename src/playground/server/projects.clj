@@ -10,6 +10,7 @@
                                             delete-record
                                             list-record]]
    [playground.server.api.projects :as api :refer [map->Project]]
+   [playground.server.requirements :refer [new-project-requirement-base-resource]]
    [playground.server.constants :refer [standard-inputs standard-outputs]]
    [playground.server.util :refer [merge-base-defaults merge-target-defaults]]
    [playground.shared.projects :as r]
@@ -129,12 +130,14 @@
                             (map->Project (get-in ctx [:parameters :body]))))}}})))
 
 (defn project-api-routes
-  [project-resource {:keys [port]}]
+  [project-resource requirement-resource {:keys [port]}]
   (let [api-routes ["/projects"
                     [
                      ["" (new-project-base-resource project-resource)]
                      ["/" (yada/redirect :playground.resources/projects-base)]
                      [["/" [#"\d+" :project-id]] (new-project-target-resource project-resource)]
+                     [["/" [#"\d+" :project-id] "/requirements"] (new-project-requirement-base-resource
+                                                                   requirement-resource)]
                      ]]]
     api-routes
     ))

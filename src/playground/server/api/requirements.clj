@@ -6,88 +6,54 @@
                                                             mutate-call-wrapper
                                                             validate-single-id
                                                             validate-single-record]]
+   [playground.server.specs.requirements :as req-specs]
    [playground.server.db.requirements :as db]))
 
-;; Requirements validation specs.
-
-(spec/def ::requirement-id #(spec/valid? :validation/valid-id %))
-
-(spec/def ::requirement-name (spec/and
-                               string?
-                               #(not (empty %))
-                               #(re-matches #"^[a-zA-Z0-9\-\.\s]*$" %)))
-
-(spec/def ::requirement-description #(spec/valid? ::validation/standard-description %))
-
-(spec/def ::requirement-project #(spec/valid? :validation/valid-id %))
-
-(spec/def ::requirement (spec/keys :req-un [::requirement-name
-                                            ::requirement-description
-                                            ::requirement-project]))
-
-(spec/def ::requirement-updates (spec/and #(not (empty? %))
-                                  (spec/keys
-                                    :opt-un [::requirement-name
-                                             ::requirement-description
-                                             ::requirement-project])))
-
-(spec/def ::requirement-update-params
-  (spec/keys
-    :req-un [::requirement-id ::requirement-updates]))
-
-(spec/def ::requirement-insert (spec/keys :req [::requirement-id ::requirement]))
-
-;; RequirementsPaths validation specs.
-
-(spec/def ::ancestor-id #(spec/valid? :validation/valid-id %))
-
-(spec/def ::descendant-id #(spec/valid? :validation/valid-id %))
-
-(spec/def ::requirements-path (spec/keys :req-un [::ancestor-id
-                                                  ::descendantid]))
 ;; Validation wrappers.
 
 (defn validate-single-requirement
   [db-call record]
-  (validate-single-record db-call ::requirement record))
+  (validate-single-record db-call ::req-specs/requirement record))
 
 (defn validate-single-requirements-path
   [db-call record]
-  (validate-single-record db-call ::requirements-path record))
+  (validate-single-record db-call ::req-specs/requirements-path record))
 
 (defn validate-single-update
   [db-call update-spec]
-  (validate-single-record db-call ::requirement-update-params update-spec))
+  (validate-single-record db-call ::req-specs/update-params update-spec))
 
 ;; Records
 
-(defrecord Requirement [requirement-name requirement-description requirement-project])
+(defrecord Requirement [requirement-project])
+
+(defrecord RequirementEdit [name description requirement-id edit-type])
 
 (defrecord RequirementsPath [ancestor-id descendant-id])
 
 ;; GET requests.
-(defn get-requirements-in-project
-  [db-spec project-id]
+(defn get-requirements-by-project-id
+  [{:keys [db-spec]} project-id]
   (read-call-wrapper
     #(validate-single-id (partial db/get-requirements-by-project db-spec) project-id)))
 
 (defn get-top-level-requirements-in-projects
-  [db-spec project-id]
+  [{:keys [db-spec]} project-id]
   (read-call-wrapper
     #(validate-single-id (partial db/get-top-level-requirements-by-project db-spec) project-id)))
 
 (defn get-ancestors-by-id
-  [db-spec requirement-id]
+  [{:keys [db-spec]} requirement-id]
   (read-call-wrapper
     #(validate-single-id (partial db/get-ancestors-by-id db-spec) requirement-id)))
 
 (defn get-descendants-by-id
-  [db-spec requirement-id]
+  [{:keys [db-spec]} requirement-id]
   (read-call-wrapper
     #(validate-single-id (partial db/get-descendants-by-id db-spec) requirement-id)))
 
 (defn get-requirement-by-id
-  [db-spec requirement-id]
+  [{:keys [db-spec]} requirement-id]
   (read-call-wrapper
     #(validate-single-id (partial db/get-requirement-by-id db-spec) requirement-id)))
 
