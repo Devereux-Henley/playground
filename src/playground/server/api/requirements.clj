@@ -25,9 +25,9 @@
 
 ;; Records
 
-(defrecord Requirement [requirement-project])
-
-(defrecord RequirementEdit [name description requirement-id edit-type])
+(defrecord Requirement [requirement-name
+                        requirement-description
+                        requirement-project])
 
 (defrecord RequirementsPath [ancestor-id descendant-id])
 
@@ -70,34 +70,37 @@
 ;; PUT requests
 
 (defn insert-root-requirement!
-  [db-spec requirement]
+  [{:keys [db-spec]} requirement]
   (mutate-call-wrapper
     #(jdbc/with-db-transaction [tx db-spec]
        (validate-single-requirement
          (comp
            (fn [{:keys [id]}] (db/insert-new-relation! tx {:id id}))
-           (partial db/insert-requirement! tx))
+           (fn [{:keys [id] :as requirement}] (do (db/insert-requirement-creation! tx requirement) requirement))
+           (fn [requirement] (-> (db/insert-requirement! tx requirement) (merge requirement))))
          requirement))))
 
 (defn insert-requirement-child!
-  [db-spec parent-id requirement]
+  [{:keys [db-spec]} parent-id requirement]
   (mutate-call-wrapper
-    (jdbc/with-db-transaction [tx db-spec]
-      (->
-        (fn [{:keys [id]}]
-          (->
-            (fn [db-result] (db/insert-new-relation!
-                             tx
-                             {:ancestor-id id
-                              :descendant-id (:id db-result)}))
-            (comp (partial db/insert-requirement! tx))
-            (validate-single-requirement requirement)))
-        (validate-single-id parent-id)))))
+    #(jdbc/with-db-transaction [tx db-spec]
+       (->
+         (fn [{:keys [id]}]
+           (->
+             (comp
+               (fn [db-result] (db/insert-requirement-child!
+                                tx
+                                {:ancestor-id id
+                                 :descendant-id (:id db-result)}))
+               (fn [{:keys [id] :as requirement}] (do (db/insert-requirement-creation! tx requirement) requirement))
+               (fn [requirement] (-> (db/insert-requirement! tx requirement) (merge requirement))))
+             (validate-single-requirement requirement)))
+         (validate-single-id parent-id)))))
 
 ;; DELETE requests
 
 (defn delete-requirement!
-  [db-spec requirement-id]
+  [{:keys [db-spec]} requirement-id]
   (mutate-call-wrapper
     #(jdbc/with-db-transaction [tx db-spec]
        (validate-single-id

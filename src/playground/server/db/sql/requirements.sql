@@ -44,8 +44,28 @@ WHERE rp.descendant = :id
 
 -- :name insert-requirement! :i!
 -- :doc Insert a single requirement.
-INSERT INTO requirements (name, description, project_id)
-VALUES (:requirement-name, :requirement-description, :requirement-project)
+INSERT INTO requirements (project_id)
+VALUES (:requirement-project)
+
+-- :name insert-requirement-creation! :i!
+-- :doc Insert a requirement_edit on creation of a requirement record
+INSERT INTO requirement_edits (requirement_id, edit_type, name, description)
+VALUES (:id, 'create', :requirement-name, :requirement-description)
+
+-- :name insert-requirement-deletion! :i!
+-- :doc Insert a requirement_edit on attempted deletion of a requirement record.
+INSERT INTO requirement_edits (requirement_id, edit_type, name, description)
+VALUES (:id, 'delete', :requirement-name, :requirement-description)
+
+-- :name insert-requirement-restore! :i!
+-- :doc Insert a requirement_edit on restoration of a requirement record.
+INSERT INTO requirement_edits (requirement_id, edit_type, name, description)
+VALUES (:id, 'restore', :requirement-name, :requirement-description)
+
+-- :name insert-requirement-edit! :i!
+-- :doc Insert a requirement_edit on edit of a requirement record.
+INSERT INTO requirement_edits (requirement_id, edit_type, name, description)
+VALUES (:id, 'edit', :requirement-name, :requirement-description)
 
 -- :name insert-requirement-child! :! :n
 -- :doc Insert a child relation between two requirements.

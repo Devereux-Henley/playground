@@ -19,7 +19,9 @@
 
 (spec/def ::requirement (spec/and #(not (empty? %))
                       (spec/keys
-                        :req-un [::requirement-project])))
+                        :req-un [::requirement-name
+                                 ::requirement-description
+                                 ::requirement-project])))
 
 (spec/def ::requirement-insert (spec/keys :req [::requirement-id ::requirement]))
 
