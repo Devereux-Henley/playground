@@ -17,13 +17,17 @@
 (spec/def ::requirement-project #(spec/valid? ::standard/valid-id %))
 
 
-(spec/def ::requirement (spec/and #(not (empty? %))
-                      (spec/keys
-                        :req-un [::requirement-name
-                                 ::requirement-description
-                                 ::requirement-project])))
+(spec/def ::requirement
+  (spec/keys
+    :req-un [::requirement-name
+             ::requirement-description
+             ::requirement-project]))
 
-(spec/def ::requirement-insert (spec/keys :req [::requirement-id ::requirement]))
+(spec/def ::requirement-insert (spec/keys :req-un [::requirement-id ::requirement]))
+
+(spec/def ::requirement-update (spec/keys :req-un [::requirement-id
+                                                   ::requirement-name
+                                                   ::requirement-description]))
 
 ;; RequirementsPaths validation specs.
 

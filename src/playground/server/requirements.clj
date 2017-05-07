@@ -18,6 +18,10 @@
    :requirement-description String
    :requirement-project Integer})
 
+(defschema RequirementUpdate
+  {:requirement-name String
+   :requirement-description String})
+
 (defschema RequirementsPath
   {:ancestor-id Integer
    :descendant-id Integer})
@@ -76,12 +80,15 @@
             :swagger/tags ["requirements" "read"]
             :response (fn [ctx]
                         (api/get-requirement-by-id requirement-resource (get-in ctx [:parameters :path :requirement-id])))}
-      :patch {:produces standard-outputs
-              :swagger/tags ["requirements" "update"]
-              :response (fn [ctx]
-                          (api/update-requirement!
-                            requirement-resource
-                            (get-in ctx [:parameters :path :requirement-id])))}
+      :post {:consumes standard-inputs
+             :produces standard-outputs
+             :parameters {:body RequirementUpdate}
+             :swagger/tags ["requirements" "update"]
+             :response (fn [ctx]
+                         (api/update-requirement!
+                           requirement-resource
+                           (get-in ctx [:parameters :path :requirement-id])
+                           (get-in ctx [:parameters :body])))}
       :delete {:consumes standard-inputs
                :produces standard-outputs
                :swagger/tags ["requirements" "delete"]

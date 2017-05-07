@@ -29,7 +29,7 @@
   [unsafe-call]
   (try
     (do
-      (unsafe-call)
+      {:results (unsafe-call)}
       success)
     (catch Exception e (let [msg (failure (or (ex-data e) (.getMessage e)))]
                          (log/error e)

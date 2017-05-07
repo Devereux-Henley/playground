@@ -20,8 +20,8 @@
   (validate-single-record db-call ::req-specs/requirements-path record))
 
 (defn validate-single-update
-  [db-call update-spec]
-  (validate-single-record db-call ::req-specs/update-params update-spec))
+  [db-call record]
+  (validate-single-record db-call ::req-specs/requirement-update record))
 
 ;; Records
 
@@ -63,9 +63,8 @@
   [db-spec requirement-id requirement]
   (mutate-call-wrapper
     #(validate-single-update
-       (partial db/update-requirement! db-spec)
-       {:requirement-id requirement-id
-        :requirement-updates requirement})))
+       (partial db/insert-requirement-edit! db-spec)
+       (assoc requirement :requirement-id requirement-id))))
 
 ;; PUT requests
 
@@ -75,8 +74,11 @@
     #(jdbc/with-db-transaction [tx db-spec]
        (validate-single-requirement
          (comp
-           (fn [{:keys [id]}] (db/insert-new-relation! tx {:id id}))
-           (fn [{:keys [id] :as requirement}] (do (db/insert-requirement-creation! tx requirement) requirement))
+           (fn [{:keys [id]}] (db/insert-new-relation! tx {:id id}) id)
+           (fn [{:keys [id] :as requirement}]
+             (let [requirement (assoc requirement :requirement-id id)]
+               (db/insert-requirement-creation! tx requirement)
+               requirement))
            (fn [requirement] (-> (db/insert-requirement! tx requirement) (merge requirement))))
          requirement))))
 
@@ -92,7 +94,10 @@
                                 tx
                                 {:ancestor-id id
                                  :descendant-id (:id db-result)}))
-               (fn [{:keys [id] :as requirement}] (do (db/insert-requirement-creation! tx requirement) requirement))
+               (fn [{:keys [id] :as requirement}]
+                 (let [requirement (assoc requirement :requirement-id id)]
+                   (db/insert-requirement-creation! tx requirement)
+                     requirement))
                (fn [requirement] (-> (db/insert-requirement! tx requirement) (merge requirement))))
              (validate-single-requirement requirement)))
          (validate-single-id parent-id)))))

@@ -3,8 +3,11 @@
 
 -- :name get-requirement-by-id :? :1
 -- :doc Get a single requirement by its id.
-SELECT r.* FROM requirements r
-WHERE r.id = :id
+SELECT re.* FROM requirement_edits re
+WHERE re.requirement_id = :id
+AND re.date_created = (SELECT MAX(date_created)
+                       FROM requirement_edits
+                       WHERE requirement_id = :id)
 
 -- :name get-requirements-by-project :? :*
 -- :doc Get all requirements associated with a specific project.
@@ -50,22 +53,22 @@ VALUES (:requirement-project)
 -- :name insert-requirement-creation! :i!
 -- :doc Insert a requirement_edit on creation of a requirement record
 INSERT INTO requirement_edits (requirement_id, edit_type, name, description)
-VALUES (:id, 'create', :requirement-name, :requirement-description)
+VALUES (:requirement-id, 'create', :requirement-name, :requirement-description)
 
 -- :name insert-requirement-deletion! :i!
 -- :doc Insert a requirement_edit on attempted deletion of a requirement record.
 INSERT INTO requirement_edits (requirement_id, edit_type, name, description)
-VALUES (:id, 'delete', :requirement-name, :requirement-description)
+VALUES (:requirement-id, 'delete', :requirement-name, :requirement-description)
 
 -- :name insert-requirement-restore! :i!
 -- :doc Insert a requirement_edit on restoration of a requirement record.
 INSERT INTO requirement_edits (requirement_id, edit_type, name, description)
-VALUES (:id, 'restore', :requirement-name, :requirement-description)
+VALUES (:requirement-id, 'restore', :requirement-name, :requirement-description)
 
 -- :name insert-requirement-edit! :i!
 -- :doc Insert a requirement_edit on edit of a requirement record.
 INSERT INTO requirement_edits (requirement_id, edit_type, name, description)
-VALUES (:id, 'edit', :requirement-name, :requirement-description)
+VALUES (:requirement-id, 'edit', :requirement-name, :requirement-description)
 
 -- :name insert-requirement-child! :! :n
 -- :doc Insert a child relation between two requirements.
@@ -78,19 +81,6 @@ INSERT INTO requirements_paths (ancestor, descendant, depth)
 -- :doc Insert a brand new top level relation.
 INSERT INTO requirements_paths (ancestor, descendant, depth)
 VALUES (:id, :id, 0)
-
--- :name update-requirement! :! :n
--- :doc Update a single requirement.
-/* :require [clojure.string :as string]
-[hugsql.parameters :refer [identifier-param-quote]] */
-UPDATE requirements SET
-/*~
-(string/join ","
-(for [[field _] (:requirement-updates params)]
-(str (identifier-param-quote (name field) options)
-" = :v:requirement-updates." (name field))))
-~*/
-WHERE id = :requirement-id
 
 -- :name delete-requirement-by-id! :! :n
 -- :doc Delete a single requirement by it's id.
