@@ -11,38 +11,43 @@ AND re.date_created = (SELECT MAX(date_created)
 
 -- :name get-requirements-by-project :? :*
 -- :doc Get all requirements associated with a specific project.
-SELECT r.* FROM requirements r
+SELECT re.* FROM requirement_edits re
+JOIN requirements r
+     ON re.requirement_id = r.id
 WHERE r.project_id = :id
 
 -- :name get-top-level-requirements-by-project :? :*
 -- :doc Get all top level requirements in project.
-SELECT r.* FROM requirements r
+SELECT DISTINCT re.* FROM requirement_edits re
+JOIN requirements r
+     ON re.requirement_id = r.id
 JOIN requirements_paths rp
-ON (r.id = rp.ancestor)
+     ON r.id = rp.ancestor
 WHERE r.project_id = :id
-and not exists (SELECT 1 FROM requirements_paths rp
-                WHERE r.id = rp.descendant)
+AND NOT EXISTS (SELECT * FROM requirements_paths rp
+                WHERE r.id = rp.descendant
+                AND r.id != rp.ancestor)
 
 -- :name get-descendants-by-id :? :*
 -- :doc Get all children of a specified requirement.
-SELECT r.* FROM requirements r
+SELECT re.* FROM requirement_edits re
 JOIN requirements_paths rp
-ON (r.id = rp.descendant)
+ON (re.requirement_id = rp.descendant)
 WHERE rp.ancestor = :id
 
 -- :name get-descendants-by-id-and-depth :? :*
 -- :doc Get all children of a specified requirement at a specific depth.
-SELECT r.* FROM requirements r
+SELECT re.* FROM requirement_edits re
 JOIN requirements_paths rp
-ON (r.id = rp.descendant)
+ON (re.requirement_id = rp.descendant)
 WHERE rp.ancestor = :id
 and rp.depth = :depth
 
 -- :name get-ancestors-by-id :? :*
 -- :doc Get all ancestors of a specified requirement.
-SELECT r.* FROM requirements r
+SELECT re.* FROM requirement_edits re
 JOIN requirements_paths rp
-ON (r.id = rp.ancestor)
+ON (re.requirement_id = rp.ancestor)
 WHERE rp.descendant = :id
 
 -- :name insert-requirement! :i!
@@ -81,11 +86,6 @@ INSERT INTO requirements_paths (ancestor, descendant, depth)
 -- :doc Insert a brand new top level relation.
 INSERT INTO requirements_paths (ancestor, descendant, depth)
 VALUES (:id, :id, 0)
-
--- :name delete-requirement-by-id! :! :n
--- :doc Delete a single requirement by it's id.
-DELETE FROM requirements
-WHERE id = :id
 
 -- :name delete-requirement-child! :! :n
 -- :doc Delete child relationships to a requirement.

@@ -38,8 +38,9 @@
               :swagger/tags ["requirements"
                              "list"]
               :response (fn [ctx]
-                          (let [project-id (get-in ctx [:parameters :path :project-id])]
-                            (if-let [top (get-in ctx [:parameters :query :top])]
+                          (let [project-id (get-in ctx [:parameters :path :project-id])
+                                top (get-in ctx [:parameters :query :top])]
+                            (if top
                               (api/get-top-level-requirements-in-projects
                                 requirement-resource
                                 project-id)

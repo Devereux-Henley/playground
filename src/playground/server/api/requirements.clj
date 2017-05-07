@@ -109,7 +109,7 @@
   (mutate-call-wrapper
     #(jdbc/with-db-transaction [tx db-spec]
        (validate-single-id
-         (juxt
-           (partial db/delete-requirement-relationships! tx)
-           (partial db/delete-requirement-by-id! tx))
+         (comp
+           (partial db/insert-requirement-deletion! tx)
+           (partial db/get-requirement-by-id tx))
          requirement-id))))
