@@ -2,6 +2,7 @@
   (:require
    [clojure.java.jdbc :as jdbc]
    [clojure.spec :as spec]
+   [clojure.string :as string]
    [playground.server.api.validation :as validation :refer [read-call-wrapper
                                                             mutate-call-wrapper
                                                             validate-single-id
@@ -31,16 +32,32 @@
 
 (defrecord RequirementsPath [ancestor-id descendant-id])
 
+(defn filter-deleted
+  [records]
+  (filter #(not (= (:edit_type %) "delete")) records))
+
+(defn db-to-api
+  [db-mappings record]
+  (loop [acc (transient {})
+         [[column translation] & remain] (vec db-mappings)]
+    (if column
+        (if-let [value (column record)]
+          (recur (assoc! acc translation value) remain)
+          (recur acc remain))
+        (persistent! acc))))
+
 ;; GET requests.
 (defn get-requirements-by-project-id
   [{:keys [db-spec]} project-id]
   (read-call-wrapper
-    #(validate-single-id (partial db/get-requirements-by-project db-spec) project-id)))
+    #(filter-deleted
+       (validate-single-id (partial db/get-requirements-by-project db-spec) project-id))))
 
 (defn get-top-level-requirements-in-projects
   [{:keys [db-spec]} project-id]
   (read-call-wrapper
-    #(validate-single-id (partial db/get-top-level-requirements-by-project db-spec) project-id)))
+    #(filter-deleted
+       validate-single-id (partial db/get-top-level-requirements-by-project db-spec) project-id)))
 
 (defn get-ancestors-by-id
   [{:keys [db-spec]} requirement-id]
@@ -50,12 +67,17 @@
 (defn get-descendants-by-id
   [{:keys [db-spec]} requirement-id]
   (read-call-wrapper
-    #(validate-single-id (partial db/get-descendants-by-id db-spec) requirement-id)))
+    #(filter-deleted
+       validate-single-id (partial db/get-descendants-by-id db-spec) requirement-id)))
 
 (defn get-requirement-by-id
   [{:keys [db-spec]} requirement-id]
   (read-call-wrapper
-    #(validate-single-id (partial db/get-requirement-by-id db-spec) requirement-id)))
+    #(when-let [record
+                (validate-single-id (partial db/get-requirement-by-id db-spec) requirement-id)]
+       (if (= (:edit_type record) "delete")
+         nil
+         record))))
 
 ;; UPDATE requests
 
@@ -105,11 +127,12 @@
 ;; DELETE requests
 
 (defn delete-requirement!
-  [{:keys [db-spec]} requirement-id]
+  [{:keys [db-spec db-mappings]} requirement-id]
   (mutate-call-wrapper
     #(jdbc/with-db-transaction [tx db-spec]
        (validate-single-id
          (comp
            (partial db/insert-requirement-deletion! tx)
+           (partial db-to-api db-mappings)
            (partial db/get-requirement-by-id tx))
          requirement-id))))

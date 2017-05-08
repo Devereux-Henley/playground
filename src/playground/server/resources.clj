@@ -13,10 +13,15 @@
 
 (defn new-requirement-resource
   [db-spec]
-  (map->StandardRestResource {:db-spec db-spec
-                              :table "requirements"
-                              :record-spec ::requirements/requirement
-                              :update-spec ::requirements/requirement}))
+  (assoc
+    (map->StandardRestResource {:db-spec db-spec
+                                :table "requirements"
+                                :record-spec ::requirements/requirement
+                                :update-spec ::requirements/requirement})
+    :db-mappings {:requirement_id :requirement-id
+                  :name           :requirement-name
+                  :description    :requirement-description
+                  :edit_type      :edit-type}))
 
 (defn new-project-resource
   [db-spec]
