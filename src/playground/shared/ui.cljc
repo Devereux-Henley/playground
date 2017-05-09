@@ -1,5 +1,6 @@
 (ns playground.shared.ui
   (:require
+   [clojure.string :as string]
    [om.dom :as dom]
    [om.next :as om :refer [defui]]))
 
@@ -13,18 +14,10 @@
     [this]
     (let [{:keys [organization/organization-name user/username]} (om/props this)]
       (dom/ul #js {:className "session-menu-list"}
-        (dom/a #js {:className "navigation-bar-link"} username)
+        (dom/a #js {:className "navigation-bar-link"} (string/capitalize username))
         (dom/li #js {:className "session-menu-item"} organization-name)))))
 
 (defonce session-menu-factory (om/factory SessionMenu))
-
-(defui ^:once LoginMenu
-  Object
-  (render
-    [this]
-    (dom/a #js {:className "navigation-bar-link" :href "/login"} "Login")))
-
-(defonce login-menu-factory (om/factory LoginMenu))
 
 (defui ^:once NavigationWrapper
   static om/IQueryParams
@@ -47,7 +40,9 @@
             (dom/a #js {:className "navigation-bar-link" :href (get-route :route/index)} "Home")
             (dom/a #js {:className "navigation-bar-link" :href (get-route :route/cards)} "Cards")
             (dom/a #js {:className "navigation-bar-link" :href (get-route :route/information)} "Information")
-            (if session (session-menu-factory session) (login-menu-factory))))
+            (if session
+              (session-menu-factory session)
+              (dom/a #js {:className "navigation-bar-link" :href (get-route :route/login)} "Login"))))
         (factory props)))))
 
 (defonce navigation-bar-factory (om/factory NavigationWrapper))

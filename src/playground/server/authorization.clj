@@ -32,8 +32,7 @@
                 (merge
                   (:response ctx)
                   (if-not authenticated?
-                    {:body "Login failed"
-                     :status 401}
+                    {:status 401}
                     {:status 200
                      :cookies
                      {"session"

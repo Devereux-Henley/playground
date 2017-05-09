@@ -7,6 +7,7 @@
    [om.next :as om]
    [playground.shared.home.cards :as cards]
    [playground.shared.home.index :as index]
+   [playground.shared.home.login :as login]
    [playground.shared.home.information :as information]
    [playground.shared.logging :as log]
    [playground.shared.ui :as ui]
@@ -35,7 +36,8 @@
 (defonce routes
   ["/" {"home"         :route/index
         "cards"        :route/cards
-        "information"  :route/information}])
+        "information"  :route/information
+        "login"        :route/login}])
 
 #?(:cljs
    (defn update-route!
@@ -52,7 +54,8 @@
 (defonce route-map
   {:route/index       index/IndexPage
    :route/cards       cards/CardsPage
-   :route/information information/InformationPage})
+   :route/information information/InformationPage
+   :route/login       login/LoginPage})
 
 (defn get-route
   [route-key]

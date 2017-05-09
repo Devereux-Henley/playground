@@ -97,14 +97,15 @@
 
 (defn home-content-routes
   [resources jwt-secret {:keys [port]}]
-  (let [content-routes ["/"
-                        [["home" (new-home-resource resources jwt-secret :route/index)]
+  (let [configured-resource (partial new-home-resource resources jwt-secret)
+        content-routes ["/"
+                        [["home" (configured-resource :route/index)]
                          ["home/" (yada/redirect :playground.resources/index)]
-                         ["information" (new-home-resource resources jwt-secret :route/information)]
+                         ["information" (configured-resource :route/information)]
                          ["information/" (yada/redirect :playground.resources/information)]
-                         ["cards" (new-home-resource resources jwt-secret :route/cards)]
+                         ["cards" (configured-resource :route/cards)]
                          ["cards/" (yada/redirect :playground.resources/cards)]
-                         ["login" (new-home-resource resources jwt-secret :route/login)]
+                         ["login" (configured-resource :route/login)]
                          ["login/" (yada/redirect :playground.resources/login)]]]]
     [""
      [
