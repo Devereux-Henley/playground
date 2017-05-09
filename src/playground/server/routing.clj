@@ -4,6 +4,7 @@
             [playground.server.authorization :refer [authorization-api-routes]]
             [playground.server.home :refer [home-content-routes home-api-routes]]
             [playground.server.organizations :refer [organization-api-routes]]
+            [playground.server.organization-users :refer [organization-user-api-routes]]
             [playground.server.projects :refer [project-api-routes]]
             [playground.server.requirements :refer [requirement-api-routes]]
             [playground.server.roles :refer [role-api-routes]]
@@ -38,6 +39,7 @@
                      (authorization-api-routes db-spec config)
                      (user-api-routes (:users resources) config)
                      (organization-api-routes (:organizations resources) config)
+                     (organization-user-api-routes (:organization-users resources) config)
                      (team-member-api-routes (:team-members resources) config)
                      (requirement-api-routes (:requirements resources) config)
                      (role-api-routes (:roles resources) config)
@@ -64,6 +66,8 @@
             :schemes ["http"]
             :tags [{:name "organizations"
                     :description "All paths for organization resources."}
+                   {:name "organization-users"
+                    :description "All paths for organization-user relation resources"}
                    {:name "users"
                     :description "All paths for user resources."}
                    {:name "user-groups"

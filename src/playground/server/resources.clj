@@ -2,6 +2,7 @@
   (:require
    [com.stuartsierra.component :refer [Lifecycle using]]
    [playground.server.specs.organizations :as organizations]
+   [playground.server.specs.organization-users :as organization-users]
    [playground.server.specs.projects :as projects]
    [playground.server.specs.requirements :as requirements]
    [playground.server.specs.roles :as roles]
@@ -37,6 +38,12 @@
                               :table "projects"
                               :record-spec ::projects/project
                               :update-spec ::projects/update-params}))
+
+(defn new-organization-user-resource
+  [db-spec]
+  (map->PivotRestResource {:db-spec db-spec
+                           :table "organization_users"
+                           :record-spec ::organization-users/organization-user}))
 
 (defn new-team-member-resource
   [db-spec]
@@ -80,6 +87,7 @@
 (defn- get-full-resource-map
   [db-spec]
   {:organizations (new-organization-resource db-spec)
+   :organization-users (new-organization-user-resource db-spec)
    :projects (new-project-resource db-spec)
    :requirements (new-requirement-resource db-spec)
    :roles (new-role-resource db-spec)
