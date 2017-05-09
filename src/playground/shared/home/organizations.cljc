@@ -16,7 +16,24 @@
   (render
     [this]
     (let [{:keys [organization/organization-name
-                  organization/organization-description]} (om/props this)]
-      (dom/li #js {:className "session-menu-item"} organization-name))))
+                  organization/organization-description
+                  organization/organization-id] :as props} (om/props this)
+          {:keys [get-route]} (om/shared this)]
+      (dom/li #js {:className "session-menu-item"
+                   :href (str (get-route :route/organizations) "/" organization-id)
+                   :onClick (fn [_] (om/transact! this `[(organization/set-organization ~props)]))}
+        organization-name))))
 
 (defonce organization-entry-factory (om/factory OrganizationEntry {:keyfn :organization/organization-name}))
+
+(defui ^:once OrganizationPage
+  static om/IQuery
+  (query
+    [this]
+    [:organization/current-organization])
+  Object
+  (render
+    [this]
+    (let [{:keys [organization/current-organization]} (om/props this)
+          {:keys [organization/organization-name]} current-organization]
+      (dom/div nil organization-name))))

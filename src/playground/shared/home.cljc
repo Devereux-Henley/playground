@@ -8,6 +8,7 @@
    [playground.shared.home.cards :as cards]
    [playground.shared.home.index :as index]
    [playground.shared.home.login :as login]
+   [playground.shared.home.organizations :as organizations]
    [playground.shared.home.information :as information]
    [playground.shared.logging :as log]
    [playground.shared.ui :as ui]
@@ -35,13 +36,39 @@
       {:value value}
       {:remote true})))
 
+(defmulti mutate-home om/dispatch)
+
+(defmethod mutate-home 'session/refresh-session
+  [{:keys [state]} _ {:keys [user/session]}]
+  {:action
+   (fn []
+     state)})
+
+(defmethod mutate-home 'organization/set-organization
+  [{:keys [state]} _ {:keys [organization/organization-name
+                             organization/organization-id
+                             organization/organization-description]}]
+  {:action
+   (fn []
+     (swap! state assoc
+       :organization/current-organization
+       {:organization-name organization-name
+        :organization-description organization-description
+        :organization-id organization-id}))})
+
 (declare app)
 
 (defonce routes
-  ["/" {"home"         :route/index
-        "cards"        :route/cards
-        "information"  :route/information
-        "login"        :route/login}])
+  ["/" [
+        ["home"         :route/index]
+        ["cards"        :route/cards]
+        ["information"  :route/information]
+        ["login"        :route/login]
+        ["organizations" [
+                          ["" :route/organizations]
+                          ["/" :route/organizations]
+                          [["/" [#"\d+" :org-id]] :route/organization-targets]
+                          ]]]])
 
 #?(:cljs
    (defn update-route!
@@ -56,10 +83,12 @@
        (partial bidi/match-route routes))))
 
 (defonce route-map
-  {:route/index       index/IndexPage
-   :route/cards       cards/CardsPage
-   :route/information information/InformationPage
-   :route/login       login/LoginPage})
+  {:route/index                index/IndexPage
+   :route/cards                cards/CardsPage
+   :route/information          information/InformationPage
+   :route/login                login/LoginPage
+   :route/organizations        organizations/OrganizationPage
+   :route/organization-targets organizations/OrganizationPage})
 
 (defn get-route
   [route-key]
@@ -67,6 +96,7 @@
 
 (defonce home-parser
   (compassus/parser {:read read-home
+                     :mutate mutate-home
                      :route-dispatch false}))
 
 #?(:clj

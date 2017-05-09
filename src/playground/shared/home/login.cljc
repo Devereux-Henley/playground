@@ -11,7 +11,10 @@
      [this get-route username password]
      (POST "/api/login"
        {:handler (fn [response]
-                   (set! (.-location js/window) (get-route :route/index)))
+                   (do
+                     (.pushState (.-history js/window) "Organization" "" (get-route :route/index))
+                     (om/transact! this `[(session/refresh-session) ~(om/force :user/session :remote)])
+                     (compassus/set-route! this :route/index)))
         :body (t/write (t/writer :json) {:user username
                                          :password password})
         :format :transit
