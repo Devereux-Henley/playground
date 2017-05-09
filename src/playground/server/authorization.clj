@@ -34,12 +34,11 @@
                   (if-not authenticated?
                     {:body "Login failed"
                      :status 401}
-                    {:status 303
-                     :body "Login succeeded"
-                     :headers {"location" (yada/url-for ctx :playground.resources/index)}
+                    {:status 200
                      :cookies
                      {"session"
-                      {:value
+                      {:path "/"
+                       :value
                        (jwt/sign
                          {:claims (pr-str {:user user :roles #{:user}})
                           :exp (time/plus (time/now) (time/hours 8))}

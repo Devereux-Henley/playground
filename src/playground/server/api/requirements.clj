@@ -79,6 +79,11 @@
          nil
          record))))
 
+(defn get-requirement-history-by-id
+  [{:keys [db-spec]} requirement-id]
+  (read-call-wrapper
+    #(validate-single-id (partial db/get-requirement-history-by-id db-spec) requirement-id)))
+
 ;; UPDATE requests
 
 (defn update-requirement!

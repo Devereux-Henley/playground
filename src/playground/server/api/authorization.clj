@@ -15,7 +15,7 @@
 (defn get-user-roles
   [db-spec id]
   (read-call-wrapper
-    (get-roles-by-user-id db-spec {:id id})))
+    #(get-roles-by-user-id db-spec {:id id})))
 
 (defn auth-user
   [db-spec {:keys [user password]}]

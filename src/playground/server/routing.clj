@@ -32,7 +32,7 @@
 ;; Routes of the entire application
 
 (defn routes
-  [resources db-spec {:keys [port] :as config}]
+  [resources jwt-secret db-spec {:keys [port] :as config}]
   (let [api-routes [""
                     [
                      (authorization-api-routes db-spec config)
@@ -52,7 +52,7 @@
                      ]]]
     [""
      [
-      (home-content-routes db-spec config)
+      (home-content-routes resources jwt-secret config)
       ["/api"
        (->
          api-routes

@@ -7,15 +7,14 @@
   static om/IQuery
   (query
     [this]
-    [:organization/organization-name :user/username :user/first-name :user/last-name])
+    [:organization/organization-name :user/username])
   Object
   (render
     [this]
-    (let [{:keys [organization/organization-name user/username user/first-name user/last-name]} (om/props this)]
+    (let [{:keys [organization/organization-name user/username]} (om/props this)]
       (dom/ul #js {:className "session-menu-list"}
         (dom/a #js {:className "navigation-bar-link"} username)
-        (dom/li #js {:className "session-menu-item"} organization-name)
-        (dom/li #js {:className "session-menu-item"} (str first-name " " last-name))))))
+        (dom/li #js {:className "session-menu-item"} organization-name)))))
 
 (defonce session-menu-factory (om/factory SessionMenu))
 

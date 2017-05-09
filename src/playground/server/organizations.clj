@@ -25,7 +25,8 @@
      :methods
      {:get {:produces standard-outputs
             :swagger/tags ["organizations" "list"]
-            :response (fn [ctx] (api/get-all-organizations db-spec))}
+            :response (fn [ctx]
+                        (api/get-all-organizations db-spec))}
       :put {:parameters {:body Organization}
             :consumes standard-inputs
             :produces standard-outputs

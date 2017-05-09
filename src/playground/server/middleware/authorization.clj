@@ -11,12 +11,17 @@
     (aero/read-config (io/file "configuration/config.edn") {})
     [:secrets :jwt-secret]))
 
-(defmethod security/verify :basic-auth
-  [ctx scheme]
+(defn check-cookie
+  [cookie secret]
   (try
     (some->
-      (get-in ctx [:cookies "session"])
+      cookie
       (jwt/unsign secret)
       :claims
       edn/read-string)
     (catch Exception e false)))
+
+(defmethod security/verify :basic-auth
+  [ctx scheme]
+  (let [cookie (get-in ctx [:cookies "session"])]
+    (check-cookie cookie secret)))

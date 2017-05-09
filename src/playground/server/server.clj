@@ -17,6 +17,7 @@
   [port
    db
    resource-map
+   jwt-secret
    listener]
   Lifecycle
   (start
@@ -27,7 +28,7 @@
       (let
         [vhosts-model (vhosts-model
                         [{:scheme :http :host (format "localhost:%d" port)}
-                         (routes resource-map db {:port port})])
+                         (routes resource-map jwt-secret db {:port port})])
          listener (yada/listener vhosts-model {:port port})]
         (infof "Started server on port %s" (:port listener))
         (assoc component :listener listener))))
@@ -43,4 +44,5 @@
   (using
     (map->Server {})
     [:db
-     :resource-map]))
+     :resource-map
+     :jwt-secret]))

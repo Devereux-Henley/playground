@@ -9,6 +9,11 @@ AND re.date_created = (SELECT MAX(date_created)
                        FROM requirement_edits
                        WHERE requirement_id = :id)
 
+-- :name get-requirement-history-by-id :? :1
+-- :doc Get the entire history of a single requirement
+SELECT re.* from requirement_edits re
+WHERE re.requirement_id = :id
+
 -- :name get-requirements-by-project :? :*
 -- :doc Get all requirements associated with a specific project.
 SELECT re.* FROM requirement_edits re

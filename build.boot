@@ -36,7 +36,7 @@
     [metosin/ring-swagger "0.23.0"]
     [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
     [prismatic/schema "1.1.4"]
-    [yada "1.2.1" :exclusions [aleph ring-swagger prismatic/schema]]
+    [yada "1.2.2" :exclusions [aleph ring-swagger prismatic/schema]]
 
     ;; App deps
     [cljs-ajax "0.5.8"]

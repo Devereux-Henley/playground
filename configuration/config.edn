@@ -5,6 +5,8 @@
  :server
  #profile {:dev {:port 3000}}
 
+ :jwt-secret #ref [:secrets :jwt-secret]
+
  :db-host "localhost"
  :db-port 5432
  :db-name "playground"

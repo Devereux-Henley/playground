@@ -34,7 +34,7 @@
               :swagger/tags ["roles" "create"]
               :response (fn [ctx]
                           (create-record role-resource (map->Role
-                                                      (get-in ctx [:parameters :body]))))}}})))
+                                                         (get-in ctx [:parameters :body]))))}}})))
 
 (defn new-role-target-resource
   [role-resource]

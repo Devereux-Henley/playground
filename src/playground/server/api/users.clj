@@ -1,5 +1,6 @@
 (ns playground.server.api.users
   (:require
+   [buddy.hashers :refer [derive check]]
    [clojure.java.jdbc :as jdbc]
    [clojure.spec :as spec]
    [playground.server.api.validation :as validation :refer [read-call-wrapper
@@ -51,12 +52,12 @@
 ;; GET requests
 
 (defn get-all-users
-  [db-spec]
+  [{:keys [db-spec]}]
   (read-call-wrapper
     #(dissoc-password (standard-db/get-all db-spec {:table table}))))
 
 (defn get-user-by-id
-  [db-spec user-id]
+  [{:keys [db-spec]} user-id]
   (read-call-wrapper
     #(dissoc-password
        (validate-single-id
@@ -67,7 +68,7 @@
 ;; PUT requests
 
 (defn insert-user!
-  [db-spec user]
+  [{:keys [db-spec]} user]
   (mutate-call-wrapper
     #(validate-single-user
        (comp (partial standard-db/insert! db-spec)
@@ -79,7 +80,7 @@
 ;; UPDATE requests
 
 (defn update-user-by-id!
-  [db-spec user-id user]
+  [{:keys [db-spec]} user-id user]
   (mutate-call-wrapper
     #(validate-single-user-update
        (comp (partial standard-db/update-by-id! db-spec)

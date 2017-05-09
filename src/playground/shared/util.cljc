@@ -41,6 +41,7 @@
           :format :transit
           :params :transit
           :response-format :transit
+          :with-credentials true
           :headers {:content-type "application/transit+json"}}))))
 
 
