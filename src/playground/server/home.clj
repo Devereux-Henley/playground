@@ -6,41 +6,13 @@
    [hiccup.page :refer [include-js include-css]]
    [om.dom :as dom]
    [om.next :as om]
-   [playground.server.middleware.authorization :refer [check-cookie]]
+   [playground.server.parsers.home :refer [home-parser]]
    [playground.shared.home :as home]
    [playground.shared.util :refer [create-om-string server-send]]
    [yada.yada :as yada]
    [playground.shared.util :as util]
    [playground.shared.ui :as ui]
    [schema.core :as schema]))
-
-(defmulti read-home-data om/dispatch)
-
-(defmethod read-home-data :default
-  [_ k _]
-  {:value {:error (str "No handler for key" k)}})
-
-(defmethod read-home-data :page/title
-  [_ _ _]
-  {:value "Baz"})
-
-(defmethod read-home-data :user/session
-  [{:keys [user] :as env} _ _]
-  (if user
-    {:value {:organization/organization-name "Server Sent Inc."
-             :user/username user}
-     :user user}
-    {:value nil}))
-
-(defmulti mutate-home-data om/dispatch)
-
-(defmethod mutate-home-data :default
-  [_ _ _]
-  {:value {:error "Cannot mutate this data."}})
-
-(defonce home-parser
-  (om/parser {:read read-home-data
-              :mutate mutate-home-data}))
 
 (defn home-page
   [send-func current-route]

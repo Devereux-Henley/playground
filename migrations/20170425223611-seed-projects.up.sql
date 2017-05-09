@@ -5,4 +5,4 @@ VALUES ('Playground', 'A monolithic web application for managing software requir
        ('Oculus Rift', 'A virtual reality headset', 2),
        ('React.js', 'A frontend library with a virtual DOM.', 2),
        ('Kansas State Online', 'A content management system for Kansas State students.', 3),
-       ('Plane Software: The Video Game', 'Real life airplane stuff', 5)
+       ('Plane Software: The Video Game', 'Real life airplane stuff', 5);

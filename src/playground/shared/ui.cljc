@@ -2,20 +2,21 @@
   (:require
    [clojure.string :as string]
    [om.dom :as dom]
-   [om.next :as om :refer [defui]]))
+   [om.next :as om :refer [defui]]
+   [playground.shared.home.organizations :refer [organization-list-factory OrganizationList]]))
 
 (defui ^:once SessionMenu
   static om/IQuery
   (query
     [this]
-    [:organization/organization-name :user/username])
+    [:user/username (om/get-query OrganizationList)])
   Object
   (render
     [this]
-    (let [{:keys [organization/organization-name user/username]} (om/props this)]
+    (let [{:keys [user/username organization/organization-list]} (om/props this)]
       (dom/ul #js {:className "session-menu-list"}
         (dom/a #js {:className "navigation-bar-link"} (string/capitalize username))
-        (dom/li #js {:className "session-menu-item"} organization-name)))))
+        (organization-list-factory organization-list)))))
 
 (defonce session-menu-factory (om/factory SessionMenu))
 

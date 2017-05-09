@@ -1,6 +1,15 @@
 -- src/playground/server/db/sql/organizations.sql
 -- organizations
 
+-- :name get-organizations-by-user-name :? :*
+-- :doc Get all organizations associated with a specific user.
+SELECT o.* FROM organizations o
+JOIN organization_users ou
+     ON o.id = ou.organization_id
+JOIN users u
+     ON ou.user_id = u.id
+WHERE u.user_name = :user-name
+
 -- :name get-all-organizations :? :*
 -- :doc Get all organizations.
 SELECT o.* FROM organizations o

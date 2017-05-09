@@ -37,7 +37,7 @@
                     [
                      (authorization-api-routes db-spec config)
                      (user-api-routes (:users resources) config)
-                     (organization-api-routes db-spec config)
+                     (organization-api-routes (:organizations resources) config)
                      (team-member-api-routes (:team-members resources) config)
                      (requirement-api-routes (:requirements resources) config)
                      (role-api-routes (:roles resources) config)
