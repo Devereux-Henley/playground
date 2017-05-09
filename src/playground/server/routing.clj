@@ -50,7 +50,7 @@
                        (:projects resources)
                        (:requirements resources)
                        config)
-                     (home-api-routes db-spec config)
+                     (home-api-routes resources config)
                      ]]]
     [""
      [

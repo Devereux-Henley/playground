@@ -10,25 +10,13 @@
   static om/IQuery
   (query [this]
     '[:organization/organization-name
-      :organization/organization-id])
-  Object
-  (render
-    [{:keys [organization/organization-name]}]
-    (dom/div nil (str "An organization by the name of " organization-name))))
-
-(defui ^:once OrganizationList
-  static om/IQuery
-  (query
-    [this]
-    (let [subquery (om/get-query OrganizationEntry)]
-      '[{:organization/organization-list ~subquery}]))
+      :organization/organization-id
+      :organization/organization-description])
   Object
   (render
     [this]
-    (let [{:keys [organization/organization-list]} (om/props this)]
-      (apply
-        dom/div nil
-        (for [{:keys [organization-name]} organization-list]
-          (dom/div nil organization-name))))))
+    (let [{:keys [organization/organization-name
+                  organization/organization-description]} (om/props this)]
+      (dom/li #js {:className "session-menu-item"} organization-name))))
 
-(defonce organization-list-factory (om/factory OrganizationList))
+(defonce organization-entry-factory (om/factory OrganizationEntry {:keyfn :organization/organization-name}))

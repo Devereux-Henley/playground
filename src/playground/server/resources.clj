@@ -15,10 +15,14 @@
 
 (defn new-organization-resource
   [db-spec]
-  (map->StandardRestResource   {:db-spec db-spec
-                                :table   "organizations"
-                                :record-spec ::organizations/organization
-                                :update-spec ::organizations/update-params}))
+  (assoc
+    (map->StandardRestResource   {:db-spec db-spec
+                                  :table   "organizations"
+                                  :record-spec ::organizations/organization
+                                  :update-spec ::organizations/update-params})
+    :db-mappings {:name        :organization/organization-name
+                  :description :organization/organization-description
+                  :id          :organization/organization-id}))
 
 (defn new-requirement-resource
   [db-spec]

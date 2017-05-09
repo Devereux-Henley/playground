@@ -6,7 +6,8 @@
                                             read-record
                                             update-record
                                             delete-record
-                                            list-record]]))
+                                            list-record]]
+   [playground.server.util :refer [db-to-api]]))
 
 (defmulti read-home-data om/dispatch)
 
@@ -19,20 +20,16 @@
   {:value "Baz"})
 
 (defmethod read-home-data :user/session
-  [{:keys [user] :as env} _ _]
-  (if user
-    {:value {:user/username user}
-     :user user}
-    {:value nil}))
-
-(defmethod read-home-data :organization/organization-list
   [{:keys [user resources] :as env} _ _]
   (if user
-    (let [{:keys [organizations]} resources
-          {:keys [db-spec]}       organizations]
-      {:value (organizations/get-organizations-by-user-name
-                db-spec
-                user)})
+    (let [{:keys [organizations]} resources]
+      {:value {:user/username user
+               :organization/organization-list
+               (mapv
+                 (partial db-to-api (:db-mappings organizations))
+                 (organizations/get-organizations-by-user-name
+                       organizations
+                       user))}})
     {:value nil}))
 
 (defmulti mutate-home-data om/dispatch)

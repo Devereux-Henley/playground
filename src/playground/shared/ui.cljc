@@ -3,20 +3,24 @@
    [clojure.string :as string]
    [om.dom :as dom]
    [om.next :as om :refer [defui]]
-   [playground.shared.home.organizations :refer [organization-list-factory OrganizationList]]))
+   [playground.shared.home.organizations :refer [organization-entry-factory OrganizationEntry]]))
 
 (defui ^:once SessionMenu
   static om/IQuery
   (query
     [this]
-    [:user/username (om/get-query OrganizationList)])
+    (let [subquery (om/get-query OrganizationEntry)]
+      [:user/username
+       `[{:organization/organization-list ~subquery}]]))
   Object
   (render
     [this]
     (let [{:keys [user/username organization/organization-list]} (om/props this)]
-      (dom/ul #js {:className "session-menu-list"}
-        (dom/a #js {:className "navigation-bar-link"} (string/capitalize username))
-        (organization-list-factory organization-list)))))
+      (apply
+        dom/ul #js {:className "session-menu-list"}
+        (cons
+          (dom/a #js {:className "navigation-bar-link"} (string/capitalize username))
+          (map organization-entry-factory organization-list))))))
 
 (defonce session-menu-factory (om/factory SessionMenu))
 
@@ -28,7 +32,7 @@
   static om/IQuery
   (query
     [this]
-    '[{:user/session ?user/session}])
+    `[{:user/session ?user/session}])
   Object
   (render
     [this]

@@ -7,6 +7,7 @@
                                                             mutate-call-wrapper
                                                             validate-single-id
                                                             validate-single-record]]
+   [playground.server.util :refer [db-to-api]]
    [playground.server.specs.requirements :as req-specs]
    [playground.server.db.requirements :as db]))
 
@@ -35,16 +36,6 @@
 (defn filter-deleted
   [records]
   (filter #(not (= (:edit_type %) "delete")) records))
-
-(defn db-to-api
-  [db-mappings record]
-  (loop [acc (transient {})
-         [[column translation] & remain] (vec db-mappings)]
-    (if column
-        (if-let [value (column record)]
-          (recur (assoc! acc translation value) remain)
-          (recur acc remain))
-        (persistent! acc))))
 
 ;; GET requests.
 (defn get-requirements-by-project-id
