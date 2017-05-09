@@ -17,6 +17,10 @@
 
 (defmulti read-home om/dispatch)
 
+(defmethod read-home :default
+  [_ _ _]
+  {:value {:error "No dispatch found."}})
+
 (defmethod read-home :page/title
   [{:keys [state query target ast logger] :as env} _ _]
   (let [st @state]

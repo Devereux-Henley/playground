@@ -4,6 +4,7 @@
    [clj-time.core :as time]
    [om.next :as om]
    [playground.server.api.authorization :as api]
+   [playground.server.constants :refer [standard-inputs]]
    [playground.server.middleware.authorization :refer [secret]]
    [schema.core :as schema :refer [required-key defschema]]
    [yada.swagger :as swagger]
@@ -21,7 +22,7 @@
     :produces  [{:media-type #{"text/plain"}
                  :charset "UTF-8"}]
     :methods
-    {:post {:consumes "application/json"
+    {:post {:consumes standard-inputs
             :produces "text/plain"
             :parameters {:body UserAuth}
             :response
