@@ -13,47 +13,68 @@ AND re.date_created = (SELECT MAX(date_created)
 -- :doc Get the entire history of a single requirement
 SELECT re.* from requirement_edits re
 WHERE re.requirement_id = :id
+ORDER BY re.date_created ASC
 
 -- :name get-requirements-by-project :? :*
 -- :doc Get all requirements associated with a specific project.
-SELECT re.* FROM requirement_edits re
+SELECT DISTINCT ON (re.requirement_id) re.* FROM requirement_edits re
 JOIN requirements r
      ON re.requirement_id = r.id
 WHERE r.project_id = :id
+AND re.date_created = (SELECT MAX(date_created)
+                       FROM requirement_edits
+                       WHERE requirement_id = :id)
+ORDER BY re.requirement_id ASC
 
 -- :name get-top-level-requirements-by-project :? :*
 -- :doc Get all top level requirements in project.
-SELECT DISTINCT re.* FROM requirement_edits re
+SELECT DISTINCT ON (re.requirement_id) re.* FROM requirement_edits re
 JOIN requirements r
      ON re.requirement_id = r.id
 JOIN requirements_paths rp
      ON r.id = rp.ancestor
 WHERE r.project_id = :id
+AND re.date_created = (SELECT MAX(date_created)
+                       FROM requirement_edits
+                       WHERE requirement_id = :id)
 AND NOT EXISTS (SELECT * FROM requirements_paths rp
                 WHERE r.id = rp.descendant
                 AND r.id != rp.ancestor)
+ORDER BY re.requirement_id ASC
 
 -- :name get-descendants-by-id :? :*
 -- :doc Get all children of a specified requirement.
-SELECT re.* FROM requirement_edits re
+SELECT DISTINCT ON (re.requirement_id) re.* FROM requirement_edits re
 JOIN requirements_paths rp
 ON (re.requirement_id = rp.descendant)
 WHERE rp.ancestor = :id
+AND re.date_created = (SELECT MAX(date_created)
+                       FROM requirement_edits
+                       WHERE requirement_id = :id)
+ORDER BY re.requirement_id ASC
 
 -- :name get-descendants-by-id-and-depth :? :*
 -- :doc Get all children of a specified requirement at a specific depth.
-SELECT re.* FROM requirement_edits re
+SELECT DISTINCT ON (re.requirement_id) re.* FROM requirement_edits re
 JOIN requirements_paths rp
 ON (re.requirement_id = rp.descendant)
 WHERE rp.ancestor = :id
-and rp.depth = :depth
+AND re.date_created = (SELECT MAX(date_created)
+                       FROM requirement_edits
+                       WHERE requirement_id = :id)
+AND rp.depth = :depth
+ORDER BY re.requirement_id ASC
 
 -- :name get-ancestors-by-id :? :*
 -- :doc Get all ancestors of a specified requirement.
-SELECT re.* FROM requirement_edits re
+SELECT DISTINCT ON (re.requirement_id) re.* FROM requirement_edits re
 JOIN requirements_paths rp
 ON (re.requirement_id = rp.ancestor)
 WHERE rp.descendant = :id
+AND re.date_created = (SELECT MAX(date_created)
+                       FROM requirement_edits
+                       WHERE requirement_id = :id)
+ORDER BY re.requirement_id ASC
 
 -- :name insert-requirement! :i!
 -- :doc Insert a single requirement.

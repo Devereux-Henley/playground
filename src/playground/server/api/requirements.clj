@@ -48,7 +48,7 @@
   [{:keys [db-spec]} project-id]
   (read-call-wrapper
     #(filter-deleted
-       validate-single-id (partial db/get-top-level-requirements-by-project db-spec) project-id)))
+       (validate-single-id (partial db/get-top-level-requirements-by-project db-spec) project-id))))
 
 (defn get-ancestors-by-id
   [{:keys [db-spec]} requirement-id]
@@ -59,7 +59,7 @@
   [{:keys [db-spec]} requirement-id]
   (read-call-wrapper
     #(filter-deleted
-       validate-single-id (partial db/get-descendants-by-id db-spec) requirement-id)))
+       (validate-single-id (partial db/get-descendants-by-id db-spec) requirement-id))))
 
 (defn get-requirement-by-id
   [{:keys [db-spec]} requirement-id]

@@ -58,6 +58,14 @@
       {:value value}
       {:remote true})))
 
+(defmethod read-home :requirements/requirements-list
+  [{:keys [state]} key {:keys [start end]}]
+  (let [st @state
+        value (get st key)]
+    (if value
+      {:value value}
+      {:remote true})))
+
 ;; :current/user {:user/name "devo"}
 (defmethod read-home :current/user
   [{:keys [state]} key params]

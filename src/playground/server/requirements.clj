@@ -33,6 +33,9 @@
       project-requirement-resource-name
       {:parameters {:path {:project-id Long}
                     :query {(schema/optional-key :top) Boolean}}
+       :access-control
+       {:scheme :basic-auth
+        :authorization {:methods {:get :user}}}
        :methods
        {:get {:produces standard-outputs
               :swagger/tags ["requirements"
@@ -55,6 +58,9 @@
      :description "Serves CRUD capabilities for requirements"
      :produces [{:media-type standard-outputs
                  :charset "UTF-8"}]
+     :access-control
+     {:scheme :basic-auth
+      :authorization {:methods {:put :user}}}
      :methods
      {:put {:parameters {:query {(schema/optional-key :parent) Long}
                          :body Requirement}
@@ -76,11 +82,27 @@
      :parameters {:path {:requirement-id Long}}
      :produces [{:media-type standard-outputs
                  :charset "UTF-8"}]
+     :access-control
+     {:scheme :basic-auth
+      :authorization {:methods {:get :user
+                                :post :user
+                                :delete :user}}}
      :methods
      {:get {:produces standard-outputs
+            :parameters {:query {(schema/optional-key :ancestor) Boolean
+                                 (schema/optional-key :descendant) Boolean}}
             :swagger/tags ["requirements" "read"]
             :response (fn [ctx]
-                        (api/get-requirement-by-id requirement-resource (get-in ctx [:parameters :path :requirement-id])))}
+                        (let [ancestor (get-in ctx [:parameters :query :ancestor])
+                              descendant (get-in ctx [:parameters :query :descendant])
+                              requirement-id (get-in ctx [:parameters :path :requirement-id])]
+                          (cond
+                            ancestor
+                            (api/get-ancestors-by-id requirement-resource requirement-id)
+                            descendant
+                            (api/get-descendants-by-id requirement-resource requirement-id)
+                            :else
+                            (api/get-requirement-by-id requirement-resource requirement-id))))}
       :post {:consumes standard-inputs
              :produces standard-outputs
              :parameters {:body RequirementUpdate}

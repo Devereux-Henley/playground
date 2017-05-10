@@ -42,7 +42,7 @@
   (query
     [this]
     '[:projects/current-project
-      (:requirements-list {:start ?start :end ?end})])
+      (:requirements/requirements-list {:start ?start :end ?end})])
   Object
   (render
     [this]

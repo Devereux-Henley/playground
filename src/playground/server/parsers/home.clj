@@ -8,6 +8,7 @@
                                             update-record
                                             delete-record
                                             list-record]]
+   [playground.server.api.requirements :as requirements]
    [playground.server.util :refer [db-to-api]]))
 
 (defmulti read-home-data om/dispatch)
@@ -44,6 +45,16 @@
                   (projects/get-all-user-projects
                     projects
                     user))]
+      {:value value})))
+
+(defmethod read-home-data :requirements/requirements-list
+  [{:keys [user resources] :as env} _ {:keys [start end project-id]}]
+  (let [{:keys [requirements]} resources]
+    (let [value (mapv
+                  (partial db-to-api (:db-mappings requirements))
+                  (requirements/get-top-level-requirements-in-projects
+                    requirements
+                    project-id))]
       {:value value})))
 
 (defmulti mutate-home-data om/dispatch)
