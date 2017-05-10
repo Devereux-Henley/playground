@@ -36,14 +36,14 @@
            organizations
            user)))}))
 
-(defmethod read-home-data :project/projects-in-organization
-  [{:keys [user resources state] :as env} _ {:keys [organization/organization-id] :as query}]
+(defmethod read-home-data :projects/projects-by-id
+  [{:keys [user resources] :as env} _ _]
   (let [{:keys [projects]} resources]
     (let [value (mapv
                   (partial db-to-api (:db-mappings projects))
-                  (projects/get-projects-in-organization
+                  (projects/get-all-user-projects
                     projects
-                    organization-id))]
+                    user))]
       {:value value})))
 
 (defmulti mutate-home-data om/dispatch)

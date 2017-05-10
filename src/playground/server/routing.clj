@@ -9,6 +9,7 @@
             [playground.server.requirements :refer [requirement-api-routes]]
             [playground.server.roles :refer [role-api-routes]]
             [playground.server.team-members :refer [team-member-api-routes]]
+            [playground.server.team-projects :refer [team-project-api-routes]]
             [playground.server.users :refer [user-api-routes]]
             [playground.server.user-groups :refer [user-group-api-routes]]
             [playground.server.user-group-relations :refer [user-group-relation-api-routes]]
@@ -41,6 +42,7 @@
                      (organization-api-routes (:organizations resources) config)
                      (organization-user-api-routes (:organization-users resources) config)
                      (team-member-api-routes (:team-members resources) config)
+                     (team-project-api-routes (:team-projects resources) config)
                      (requirement-api-routes (:requirements resources) config)
                      (role-api-routes (:roles resources) config)
                      (user-group-api-routes (:user-groups resources) config)
@@ -82,6 +84,8 @@
                     :description "All paths for requirement resources."}
                    {:name "team-members"
                     :description "All paths for team-member resources."}
+                   {:name "team-projects"
+                    :description "All paths for team-project resources."}
                    {:name "projects"
                     :description "All paths for project resources."}
                    {:name "read"

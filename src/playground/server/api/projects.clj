@@ -9,3 +9,9 @@
   (db/get-all-projects-in-organization
     db-spec
     {:id organization-id}))
+
+(defn get-all-user-projects
+  [{:keys [db-spec]} user-name]
+  (db/get-all-user-projects
+    db-spec
+    {:name user-name}))

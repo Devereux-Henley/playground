@@ -27,7 +27,7 @@
                     :onClick (fn [_] (do
                                       (om/transact!
                                         (om/get-reconciler this)
-                                        `[(organization/set-organization ~props)])
+                                        `[(organizations/set-organization ~props)])
                                       true))}
           organization-name)))))
 
@@ -37,11 +37,14 @@
   static om/IQuery
   (query
     [this]
-    [:organizations/current-organization])
+    (let [project-query (om/get-query ProjectEntry)]
+      `[:organizations/current-organization
+        {:projects/projects-by-id ~project-query}]))
   Object
   (render
     [this]
-    (let [{:keys [organizations/current-organization] :as props} (om/props this)
+    (let [{:keys [organizations/current-organization
+                  projects/projects-by-id] :as props} (om/props this)
           {:keys [organizations/organization-name
                   organizations/organization-description
                   organizations/organization-id]} (first current-organization)]
@@ -51,4 +54,12 @@
         (dom/p #js {:className "organization-description"}
           organization-description)
         (dom/h2 #js {:className "project-header"}
-          "Projects in this organization: ")))))
+          "Projects in this organization: ")
+        (apply
+          dom/ul #js {:className "project-list"}
+          (reduce (fn [acc val]
+                    (if (= (:organizations/organization-id val) organization-id)
+                      (conj acc (project-entry-factory val))
+                      acc))
+            []
+            projects-by-id))))))

@@ -9,6 +9,7 @@
    [playground.shared.home.index :as index]
    [playground.shared.home.login :as login]
    [playground.shared.home.organizations :as organizations]
+   [playground.shared.home.projects :as projects]
    [playground.shared.home.information :as information]
    [playground.shared.logging :as log]
    [playground.shared.ui :as ui]
@@ -25,14 +26,6 @@
       {:value value}
       {:value nil})))
 
-;; :projects/by-id [{:project-id 1} {:project-id 2}]
-(defmethod read-home :project/by-id
-  [{:keys [state query target ast logger] :as env} key _]
-  (let [st @state]
-    (if-let [[_ value] (find st key)]
-      {:value value}
-      {:remote true})))
-
 ;; :organizations/current-organization {:organization-id 1}
 (defmethod read-home :organizations/current-organization
   [{:keys [state query-root target ast logger] :as env} key _]
@@ -41,9 +34,24 @@
               (om/db->tree '[[:organizations/current-organization _]] st st)
               :organizations/current-organization)}))
 
+(defmethod read-home :projects/current-project
+  [{:keys [state query-root target ast logger] :as env} key _]
+  (let [st @state]
+    {:value (get
+              (om/db->tree '[[:projects/current-project _]] st st)
+              :projects/current-project)}))
+
 ;; :organizations/by-id [{:organization-id 1} {:organization-id 2}]
 (defmethod read-home :organizations/organizations-by-id
   [{:keys [state query]} key params]
+  (let [st @state
+        value (get st key)]
+    (if value
+      {:value value}
+      {:remote true})))
+
+(defmethod read-home :projects/projects-by-id
+  [{:keys [ast state query]} key params]
   (let [st @state
         value (get st key)]
     (if value
@@ -66,13 +74,21 @@
    (fn []
      state)})
 
-(defmethod mutate-home 'organization/set-organization
+(defmethod mutate-home 'organizations/set-organization
   [{:keys [state]} _ {:keys [organizations/organization-id]}]
   {:action
    (fn []
      (swap! state assoc
        :organizations/current-organization
        [[:organizations/organizations-by-id organization-id]]))})
+
+(defmethod mutate-home 'projects/set-project
+  [{:keys [state]} _ {:keys [projects/project-id]}]
+  {:action
+   (fn []
+     (swap! state assoc
+       :projects/current-project
+       [[:projects/projects-by-id project-id]]))})
 
 (declare app)
 
@@ -85,8 +101,13 @@
         ["organizations" [
                           ["" :route/organizations]
                           ["/" :route/organizations]
-                          [["/" [#"\d+" :org-id]] :route/organization-targets]
-                          ]]]])
+                          [["/" [#"\d+" :organization-id]] :route/organization-targets]
+                          ]]
+        ["projects" [
+                     ["" :route/projects]
+                     ["/" :route/projects]
+                     [["/" [#"\d+" :project-id]] :route/project-targets]
+                     ]]]])
 
 #?(:cljs
    (defn update-route!
@@ -106,7 +127,9 @@
    :route/information          information/InformationPage
    :route/login                login/LoginPage
    :route/organizations        organizations/OrganizationPage
-   :route/organization-targets organizations/OrganizationPage})
+   :route/organization-targets organizations/OrganizationPage
+   :route/projects             projects/ProjectPage
+   :route/project-targets      projects/ProjectPage})
 
 (defn get-route
   [route-key]

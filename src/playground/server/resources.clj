@@ -7,6 +7,7 @@
    [playground.server.specs.requirements :as requirements]
    [playground.server.specs.roles :as roles]
    [playground.server.specs.team-members :as team-members]
+   [playground.server.specs.team-projects :as team-projects]
    [playground.server.specs.user-groups :as user-groups]
    [playground.server.specs.user-group-relations :as user-group-relations]
    [playground.server.specs.user-group-role-relations :as user-group-role-relations]
@@ -43,10 +44,16 @@
                                 :table "projects"
                                 :record-spec ::projects/project
                                 :update-spec ::projects/update-params})
-    :db-mappings {:id              :project/project-id
-                  :name            :project/project-name
-                  :description     :project/project-description
-                  :organization_id :organization/organization-id}))
+    :db-mappings {:id              :projects/project-id
+                  :name            :projects/project-name
+                  :description     :projects/project-description
+                  :organization_id :organizations/organization-id}))
+
+(defn new-team-projects-resource
+  [db-spec]
+  (map->PivotRestResource {:db-spec db-spec
+                           :table "team_projects"
+                           :record-spec ::team-projects/team-project}))
 
 (defn new-organization-user-resource
   [db-spec]
@@ -101,6 +108,7 @@
    :requirements (new-requirement-resource db-spec)
    :roles (new-role-resource db-spec)
    :team-members (new-team-member-resource db-spec)
+   :team-projects (new-team-projects-resource db-spec)
    :users (new-user-resource db-spec)
    :user-groups (new-user-group-resource db-spec)
    :user-group-relations (new-user-group-relation-resource db-spec)

@@ -13,7 +13,8 @@
        {:handler (fn [response]
                    (do
                      (.pushState (.-history js/window) "Organization" "" (get-route :route/index))
-                     (om/transact! this `[~(om/force :current/user :remote)])
+                     (om/transact! this `[~(om/force :current/user :remote)
+                                          ~(om/force :organizations/organizations-by-id :remote)])
                      (compassus/set-route! this :route/index)))
         :body (t/write (t/writer :json) {:user username
                                          :password password})
