@@ -19,8 +19,18 @@
 (defmulti read-home om/dispatch)
 
 (defmethod read-home :default
-  [_ _ _]
-  {:value {:error "No dispatch found."}})
+  [{:keys [state query target ast logger] :as env} key _]
+  (let [st @state]
+    (if-let [[_ value] (find st key)]
+      {:value value}
+      {:value nil})))
+
+(defmethod read-home :organization/current-organization
+  [{:keys [state query target ast logger] :as env} key _]
+  (let [st @state]
+    (if-let [[_ value] (find st key)]
+      {:value value}
+      {:remote false})))
 
 (defmethod read-home :page/title
   [{:keys [state query target ast logger] :as env} _ _]
@@ -39,22 +49,23 @@
 (defmulti mutate-home om/dispatch)
 
 (defmethod mutate-home 'session/refresh-session
-  [{:keys [state]} _ {:keys [user/session]}]
+  [{:keys [state]} _ _]
   {:action
    (fn []
-     state)})
+     @state)})
 
 (defmethod mutate-home 'organization/set-organization
   [{:keys [state]} _ {:keys [organization/organization-name
                              organization/organization-id
-                             organization/organization-description]}]
+                             organization/organization-description] :as props}]
   {:action
    (fn []
      (swap! state assoc
        :organization/current-organization
        {:organization-name organization-name
         :organization-description organization-description
-        :organization-id organization-id}))})
+        :organization-id organization-id}))
+   :value props})
 
 (declare app)
 
