@@ -1,6 +1,13 @@
 -- src/playground/server/db/sql/projects.sql
 -- Projects
 
+-- :name get-all-projects-in-organization
+-- :doc Gets all projects that are in a specific organization
+SELECT p.* FROM projects p
+JOIN organizations o
+     ON p.organization_id = o.id
+WHERE o.id = :id
+
 -- :name get-all-projects :? :n
 -- :doc Get all projects.
 SELECT p.* FROM projects p

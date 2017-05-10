@@ -5,38 +5,18 @@
    [om.next :as om :refer [defui]]
    [playground.shared.home.organizations :refer [organization-entry-factory OrganizationEntry]]))
 
-(defui ^:once SessionMenu
-  static om/IQuery
-  (query
-    [this]
-    (let [subquery (om/get-query OrganizationEntry)]
-      [:user/username
-       `[{:organization/organization-list ~subquery}]]))
-  Object
-  (render
-    [this]
-    (let [{:keys [user/username organization/organization-list]} (om/props this)]
-      (apply
-        dom/ul #js {:className "session-menu-list"}
-        (cons
-          (dom/a #js {:className "navigation-bar-link"} (string/capitalize username))
-          (map organization-entry-factory organization-list))))))
-
-(defonce session-menu-factory (om/factory SessionMenu))
-
 (defui ^:once NavigationWrapper
-  static om/IQueryParams
-  (params
-    [this]
-    {:user/session (om/get-query SessionMenu)})
   static om/IQuery
   (query
     [this]
-    `[{:user/session ?user/session}])
+    (let [organization-query (om/get-query OrganizationEntry)]
+      `[{:current/user [:user/name]}
+        {:organizations/organizations-by-id ~organization-query}]))
   Object
   (render
     [this]
-    (let [{:keys [user/session]} (om/props this)
+    (let [{:keys [current/user
+                  organizations/organizations-by-id]} (om/props this)
           {:keys [get-route]}    (om/shared this)
           {:keys [owner factory props] :as computed} (om/get-computed this)]
       (dom/div #js {:className "app-container"}
@@ -45,8 +25,12 @@
             (dom/a #js {:className "navigation-bar-link" :href (get-route :route/index)} "Home")
             (dom/a #js {:className "navigation-bar-link" :href (get-route :route/cards)} "Cards")
             (dom/a #js {:className "navigation-bar-link" :href (get-route :route/information)} "Information")
-            (if session
-              (session-menu-factory session)
+            (if user
+              (apply
+                dom/ul #js {:className "session-menu-list"}
+                (cons
+                  (dom/a #js {:className "navigation-bar-link"} (string/capitalize (:user/name user)))
+                  (map organization-entry-factory (vals organizations-by-id))))
               (dom/a #js {:className "navigation-bar-link" :href (get-route :route/login)} "Login"))))
         (factory props)))))
 

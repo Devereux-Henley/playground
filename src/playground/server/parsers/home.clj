@@ -2,6 +2,7 @@
   (:require
    [om.next :as om]
    [playground.server.api.organizations :as organizations]
+   [playground.server.api.projects :as projects]
    [playground.server.api.protocols :refer [create-record
                                             read-record
                                             update-record
@@ -19,18 +20,31 @@
   [_ _ _]
   {:value "Baz"})
 
-(defmethod read-home-data :user/session
+(defmethod read-home-data :current/user
   [{:keys [user resources] :as env} _ _]
-  (if user
-    (let [{:keys [organizations]} resources]
-      {:value {:user/username user
-               :organization/organization-list
-               (mapv
-                 (partial db-to-api (:db-mappings organizations))
-                 (organizations/get-organizations-by-user-name
-                       organizations
-                       user))}})
-    {:value nil}))
+  {:value {:user/name user}})
+
+(defmethod read-home-data :organizations/organizations-by-id
+  [{:keys [user resources] :as env} _ _]
+  (let [{:keys [organizations]} resources]
+    {:value
+     (into {}
+       (mapv
+         (fn [{:keys [id] :as record}]
+           {id (db-to-api (:db-mappings organizations) record)})
+         (organizations/get-organizations-by-user-name
+           organizations
+           user)))}))
+
+(defmethod read-home-data :project/projects-in-organization
+  [{:keys [user resources state] :as env} _ {:keys [organization/organization-id] :as query}]
+  (let [{:keys [projects]} resources]
+    (let [value (mapv
+                  (partial db-to-api (:db-mappings projects))
+                  (projects/get-projects-in-organization
+                    projects
+                    organization-id))]
+      {:value value})))
 
 (defmulti mutate-home-data om/dispatch)
 

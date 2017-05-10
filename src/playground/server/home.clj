@@ -62,6 +62,7 @@
      {:post {:consumes #{"application/transit+json;q=0.9"}
              :produces #{"application/transit+json;q=0.9"}
              :response (fn [{:keys [authentication body]}]
+                         (println body)
                          (home-parser
                            {:user (get-in authentication ["default" :user])
                             :resources resources}

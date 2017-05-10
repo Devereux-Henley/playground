@@ -25,22 +25,34 @@
       {:value value}
       {:value nil})))
 
-(defmethod read-home :organization/current-organization
+;; :projects/by-id [{:project-id 1} {:project-id 2}]
+(defmethod read-home :project/by-id
   [{:keys [state query target ast logger] :as env} key _]
   (let [st @state]
     (if-let [[_ value] (find st key)]
       {:value value}
-      {:remote false})))
-
-(defmethod read-home :page/title
-  [{:keys [state query target ast logger] :as env} _ _]
-  (let [st @state]
-    (if (some st query)
-      {:value (select-keys st query)}
       {:remote true})))
 
-(defmethod read-home :user/session
-  [{:keys [state query target ast logger] :as env} key _]
+;; :organizations/current-organization {:organization-id 1}
+(defmethod read-home :organizations/current-organization
+  [{:keys [state query-root target ast logger] :as env} key _]
+  (let [st @state]
+    {:value (get
+              (om/db->tree '[[:organizations/current-organization _]] st st)
+              :organizations/current-organization)}))
+
+;; :organizations/by-id [{:organization-id 1} {:organization-id 2}]
+(defmethod read-home :organizations/organizations-by-id
+  [{:keys [state query]} key params]
+  (let [st @state
+        value (get st key)]
+    (if value
+      {:value value}
+      {:remote true})))
+
+;; :current/user {:user/name "devo"}
+(defmethod read-home :current/user
+  [{:keys [state]} key params]
   (let [st @state]
     (if-let [[_ value] (find st key)]
       {:value value}
@@ -48,24 +60,19 @@
 
 (defmulti mutate-home om/dispatch)
 
-(defmethod mutate-home 'session/refresh-session
+(defmethod mutate-home 'any/refresh
   [{:keys [state]} _ _]
   {:action
    (fn []
-     @state)})
+     state)})
 
 (defmethod mutate-home 'organization/set-organization
-  [{:keys [state]} _ {:keys [organization/organization-name
-                             organization/organization-id
-                             organization/organization-description] :as props}]
+  [{:keys [state]} _ {:keys [organizations/organization-id]}]
   {:action
    (fn []
      (swap! state assoc
-       :organization/current-organization
-       {:organization-name organization-name
-        :organization-description organization-description
-        :organization-id organization-id}))
-   :value props})
+       :organizations/current-organization
+       [[:organizations/organizations-by-id organization-id]]))})
 
 (declare app)
 

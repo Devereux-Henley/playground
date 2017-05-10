@@ -20,9 +20,9 @@
                                   :table   "organizations"
                                   :record-spec ::organizations/organization
                                   :update-spec ::organizations/update-params})
-    :db-mappings {:name        :organization/organization-name
-                  :description :organization/organization-description
-                  :id          :organization/organization-id}))
+    :db-mappings {:name        :organizations/organization-name
+                  :description :organizations/organization-description
+                  :id          :organizations/organization-id}))
 
 (defn new-requirement-resource
   [db-spec]
@@ -38,10 +38,15 @@
 
 (defn new-project-resource
   [db-spec]
-  (map->StandardRestResource {:db-spec db-spec
-                              :table "projects"
-                              :record-spec ::projects/project
-                              :update-spec ::projects/update-params}))
+  (assoc
+    (map->StandardRestResource {:db-spec db-spec
+                                :table "projects"
+                                :record-spec ::projects/project
+                                :update-spec ::projects/update-params})
+    :db-mappings {:id              :project/project-id
+                  :name            :project/project-name
+                  :description     :project/project-description
+                  :organization_id :organization/organization-id}))
 
 (defn new-organization-user-resource
   [db-spec]
