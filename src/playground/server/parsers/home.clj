@@ -40,22 +40,31 @@
 (defmethod read-home-data :projects/projects-by-id
   [{:keys [user resources] :as env} _ _]
   (let [{:keys [projects]} resources]
-    (let [value (mapv
-                  (partial db-to-api (:db-mappings projects))
-                  (projects/get-all-user-projects
-                    projects
-                    user))]
+    (let [value
+          (into {}
+            (mapv
+              (fn [{:keys [id] :as record}]
+                {id (db-to-api (:db-mappings projects) record)})
+              (projects/get-all-user-projects
+                projects
+                user)))]
       {:value value})))
 
 (defmethod read-home-data :requirements/requirements-list
-  [{:keys [user resources] :as env} _ {:keys [start end project-id]}]
-  (let [{:keys [requirements]} resources]
-    (let [value (mapv
-                  (partial db-to-api (:db-mappings requirements))
-                  (requirements/get-top-level-requirements-in-projects
-                    requirements
-                    project-id))]
-      {:value value})))
+  [{:keys [user resources] :as env} _ {:keys [project-ids]}]
+  (when project-ids
+    (let [{:keys [requirements]} resources]
+      (let [value
+            (into {}
+              (mapv
+                (fn [{:keys [id] :as record}]
+                  {id (db-to-api (:secondary-mappings requirements) record)})
+                (:results
+                 (requirements/get-top-level-requirements-in-project-ids
+                   requirements
+                   (vec project-ids)))))]
+        (clojure.pprint/pprint value)
+        {:value value}))))
 
 (defmulti mutate-home-data om/dispatch)
 

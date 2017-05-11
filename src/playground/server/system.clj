@@ -2,10 +2,13 @@
   (:require
     [aero.core :as aero]
     [clojure.java.io :as io]
-    [com.stuartsierra.component :refer [system-map system-using]]
+    [com.stuartsierra.component :as component :refer [system-map system-using]]
     [playground.server.server :refer [new-server]]
     [playground.server.resources :refer [new-resource-map]]
-    [playground.server.db :as db]))
+    [playground.server.db :as db])
+  (:gen-class))
+
+(def system nil)
 
 (defn config
   [profile]
@@ -37,3 +40,9 @@
 (defn dev-system
   []
   (new-system :dev))
+
+(defn -main
+  [& args]
+  (let [system (new-system :prod)]
+    (component/start system))
+  @(promise))

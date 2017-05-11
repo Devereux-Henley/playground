@@ -44,11 +44,17 @@
     #(filter-deleted
        (validate-single-id (partial db/get-requirements-by-project db-spec) project-id))))
 
-(defn get-top-level-requirements-in-projects
+(defn get-top-level-requirements-in-project
   [{:keys [db-spec]} project-id]
   (read-call-wrapper
     #(filter-deleted
        (validate-single-id (partial db/get-top-level-requirements-by-project db-spec) project-id))))
+
+(defn get-top-level-requirements-in-project-ids
+  [{:keys [db-spec]} project-ids]
+  (read-call-wrapper
+    #(filter-deleted
+       (db/get-top-level-requirements-in-project-ids db-spec {:project-ids project-ids}))))
 
 (defn get-ancestors-by-id
   [{:keys [db-spec]} requirement-id]

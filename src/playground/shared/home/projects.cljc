@@ -1,7 +1,8 @@
 (ns playground.shared.home.projects
   (:require
    [om.dom :as dom]
-   [om.next :as om :refer [defui]]))
+   [om.next :as om :refer [defui]]
+   [playground.shared.home.requirements :refer [requirement-entry-factory]]))
 
 (defui ^:once ProjectEntry
   static om/Ident
@@ -25,7 +26,9 @@
           (dom/a #js {:className "project-name"
                       :href (str (get-route :route/projects) "/" project-id)
                       :onClick (fn [_] (do
-                                        (om/transact! (om/get-reconciler this) `[(projects/set-project ~props)])
+                                        (om/transact! (om/get-reconciler this) `[(projects/set-project ~props)
+                                                                                 :projects/current-project
+                                                                                 :requirements/requirements-list])
                                         true))}
             project-name)
           (dom/p #js {:className "project-description"}
@@ -46,10 +49,14 @@
   Object
   (render
     [this]
-    (let [{:keys [projects/current-project]} (om/props this)
+    (let [{:keys [projects/current-project
+                  requirements/requirements-list] :as props} (om/props this)
           {:keys [projects/project-name
                   projects/project-id
                   projects/project-description]} (first current-project)]
       (dom/div #js {:className "project-page"}
         (dom/h2 #js {:className "project-page-title"}
-          project-name)))))
+          project-name)
+        (apply
+          dom/ul #js {:className "requirements-list"}
+          (map requirement-entry-factory (vals requirements-list)))))))

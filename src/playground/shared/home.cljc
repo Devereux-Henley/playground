@@ -59,12 +59,12 @@
       {:remote true})))
 
 (defmethod read-home :requirements/requirements-list
-  [{:keys [state]} key {:keys [start end]}]
+  [{:keys [state ast]} key {:keys [start end]}]
   (let [st @state
         value (get st key)]
     (if value
       {:value value}
-      {:remote true})))
+      {:remote (assoc-in ast [:params :project-ids] (keys (get st :projects/projects-by-id)))})))
 
 ;; :current/user {:user/name "devo"}
 (defmethod read-home :current/user

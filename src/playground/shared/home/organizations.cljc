@@ -49,7 +49,7 @@
                   organizations/organization-description
                   organizations/organization-id]} (first current-organization)]
       (dom/div #js {:className "organization-page"}
-        (dom/p #js {:className "organization-name"}
+        (dom/h1 #js {:className "organization-name"}
           organization-name)
         (dom/p #js {:className "organization-description"}
           organization-description)
@@ -62,4 +62,4 @@
                       (conj acc (project-entry-factory val))
                       acc))
             []
-            projects-by-id))))))
+            (vals projects-by-id)))))))

@@ -155,6 +155,10 @@
   (comp
     (sass :output-style :compressed)
     (cljs :ids cljs-build-ids :optimizations :advanced)
+    (aot :namespace #{'playground.server.system})
+    (pom :project (symbol "playground") :version "0.1.0")
+    (uber)
+    (jar :main 'playground.server.system)
     (target :dir #{"static"})))
 
 (defn- run-system [profile]

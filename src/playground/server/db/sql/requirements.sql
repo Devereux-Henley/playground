@@ -36,10 +36,23 @@ JOIN requirements_paths rp
 WHERE r.project_id = :id
 AND re.date_created = (SELECT MAX(date_created)
                        FROM requirement_edits
-                       WHERE requirement_id = :id)
+                       WHERE r.project_id = :id)
 AND NOT EXISTS (SELECT * FROM requirements_paths rp
                 WHERE r.id = rp.descendant
                 AND r.id != rp.ancestor)
+ORDER BY re.requirement_id ASC
+
+-- :name get-top-level-requirements-in-project-ids :? :*
+-- :doc Get all top level requirements in a group of projects.
+SELECT DISTINCT ON (re.requirement_id) re.* FROM requirement_edits re
+JOIN requirements r
+     ON re.requirement_id = r.id
+JOIN requirements_paths rp
+     ON r.id = rp.ancestor
+WHERE r.project_id IN ( :v*:project-ids )
+      AND NOT EXISTS (SELECT * FROM requirements_paths rp
+                      WHERE r.id = rp.descendant
+                      AND r.id != rp.ancestor)
 ORDER BY re.requirement_id ASC
 
 -- :name get-descendants-by-id :? :*

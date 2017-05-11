@@ -44,7 +44,7 @@
                           (let [project-id (get-in ctx [:parameters :path :project-id])
                                 top (get-in ctx [:parameters :query :top])]
                             (if top
-                              (api/get-top-level-requirements-in-projects
+                              (api/get-top-level-requirements-in-project
                                 requirement-resource
                                 project-id)
                               (api/get-requirements-by-project-id

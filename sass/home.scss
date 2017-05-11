@@ -1,12 +1,43 @@
 @import "common";
 @import "navigation";
 
-.login {
+.login-page {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: $page-width;
+}
+
+.login-body {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-color: black;
+    border-width: 3px;
+    border-style: solid;
+}
+
+.error {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-color: red;
+    border-width: 2px;
+    border-style: solid;
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
+
+    label {
+        padding-bottom: 12px;
+
+        input {
+            margin-left: 20px;
+            float: right;
+        }
+    }
 }
