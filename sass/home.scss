@@ -1,5 +1,6 @@
 @import "common";
 @import "navigation";
+@import "requirements";
 
 .login-page {
     display: flex;
@@ -21,6 +22,8 @@
 .error {
     padding-top: 5px;
     padding-bottom: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
     margin-top: 10px;
     margin-bottom: 10px;
     border-color: red;

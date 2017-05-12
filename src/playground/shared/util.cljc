@@ -37,6 +37,7 @@
        (POST url
          {:handler (fn [response]
                      (post-callback response))
+          :error-handler (fn [response])
           :body (t/write (t/writer :json) remote)
           :format :transit
           :params :transit

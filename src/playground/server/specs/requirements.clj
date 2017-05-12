@@ -25,9 +25,11 @@
 
 (spec/def ::requirement-insert (spec/keys :req-un [::requirement-id ::requirement]))
 
-(spec/def ::requirement-update (spec/keys :req-un [::requirement-id
-                                                   ::requirement-name
-                                                   ::requirement-description]))
+(spec/def ::requirement-update
+  (spec/keys
+    :req-un [::requirement-id
+             ::requirement-name
+             ::requirement-description]))
 
 ;; RequirementsPaths validation specs.
 

@@ -22,7 +22,7 @@
                   organizations/organization-id] :as props} (om/props this)
           {:keys [get-route]} (om/shared this)]
       (dom/li #js {:className "session-menu-item"}
-        (dom/a #js {:className "nav-text"
+        (dom/a #js {:className "organization-link"
                     :href (str (get-route :route/organizations) "/" organization-id)
                     :onClick (fn [_] (do
                                       (om/transact!

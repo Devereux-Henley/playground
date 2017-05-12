@@ -28,7 +28,7 @@ ORDER BY re.requirement_id ASC
 
 -- :name get-top-level-requirements-by-project :? :*
 -- :doc Get all top level requirements in project.
-SELECT DISTINCT ON (re.requirement_id) re.* FROM requirement_edits re
+SELECT DISTINCT ON (re.requirement_id) re.*, r.project_id FROM requirement_edits re
 JOIN requirements r
      ON re.requirement_id = r.id
 JOIN requirements_paths rp
@@ -44,7 +44,7 @@ ORDER BY re.requirement_id ASC
 
 -- :name get-top-level-requirements-in-project-ids :? :*
 -- :doc Get all top level requirements in a group of projects.
-SELECT DISTINCT ON (re.requirement_id) re.* FROM requirement_edits re
+SELECT DISTINCT ON (re.requirement_id) re.*, r.project_id FROM requirement_edits re
 JOIN requirements r
      ON re.requirement_id = r.id
 JOIN requirements_paths rp

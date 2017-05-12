@@ -40,12 +40,14 @@
   static om/IQueryParams
   (params
     [this]
-    {:start 0 :end 10})
+    {:depth 0
+     :selected-branch-id 1})
   static om/IQuery
   (query
     [this]
     '[:projects/current-project
-      (:requirements/requirements-list {:start ?start :end ?end})])
+      (:requirements/requirements-list {:depth ?depth
+                                        :selected-branch-id ?selected-branch-id})])
   Object
   (render
     [this]
@@ -59,4 +61,6 @@
           project-name)
         (apply
           dom/ul #js {:className "requirements-list"}
-          (map requirement-entry-factory (vals requirements-list)))))))
+          (map requirement-entry-factory
+            (filter #(= (:projects/project-id %) project-id)
+              (vals requirements-list))))))))

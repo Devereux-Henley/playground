@@ -52,8 +52,18 @@ $nav-text-shadow: 0px 0px 15px rgba(34, 255, 169, 1);
 
 .session-menu-item {
     @extend .nav-text;
+    list-style-type: none;
+    text-decoration: none;
     display: none;
     position: relative;
+}
+
+.organization-link {
+    @extend .nav-text;
+    list-style-type: none;
+    text-decoration: none;
+    margin-top: 6px;
+    margin-bottom: 3px;
 }
 
 .session-menu-list:hover .session-menu-item {

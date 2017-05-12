@@ -51,7 +51,7 @@
           {:keys [get-route]}         (om/shared this)]
       (dom/div #js {:className "login-page"}
         (dom/div #js {:className "login-body"}
-          (dom/h1 nil "Login Page")
+          (dom/h1 nil "Login")
           (dom/div #js {:className "login-form"}
             (dom/label nil
               "Username: "

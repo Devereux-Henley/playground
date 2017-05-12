@@ -41,7 +41,8 @@
     {:requirement_id :requirements/requirement-id
      :name           :requirements/requirement-name
      :description    :requirements/requirement-description
-     :edit_type      :requirements/requirement-edit-type}))
+     :edit_type      :requirements/requirement-edit-type
+     :project_id     :projects/project-id}))
 
 (defn new-project-resource
   [db-spec]

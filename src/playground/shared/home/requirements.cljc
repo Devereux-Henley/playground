@@ -24,7 +24,6 @@
           (dom/a #js {:className "requirement-name"}
             requirement-name)
           (dom/p #js {:className "requirement-description"}
-            requirement-description)
-          (dom/button #js {:className "requirement-history"}))))))
+            requirement-description))))))
 
 (defonce requirement-entry-factory (om/factory RequirementEntry {:keyfn :requirements/requirement-id}))

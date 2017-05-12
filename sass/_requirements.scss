@@ -1,0 +1,15 @@
+@import "common";
+
+.requirement-list-element {
+    list-style: none;
+}
+
+.requirement-body {
+    border-style: solid;
+    border-color: black;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}

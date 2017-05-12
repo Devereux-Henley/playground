@@ -58,12 +58,12 @@
             (into {}
               (mapv
                 (fn [{:keys [id] :as record}]
+                  (clojure.pprint/pprint record)
                   {id (db-to-api (:secondary-mappings requirements) record)})
                 (:results
                  (requirements/get-top-level-requirements-in-project-ids
                    requirements
                    (vec project-ids)))))]
-        (clojure.pprint/pprint value)
         {:value value}))))
 
 (defmulti mutate-home-data om/dispatch)
